@@ -1,5 +1,135 @@
+import { useNavigate } from 'react-router-dom'
+import {
+  FilePlus,
+  Package,
+  Users,
+  Wallet,
+  ArrowRight,
+  Clock,
+  CheckCircle2,
+  DollarSign,
+} from 'lucide-react'
+import MainLayout from '../../components/layout/MainLayout'
+
+const NAV_LINKS = [
+  { icon: <FilePlus size={18} />, label: 'Nuevo Pedido', path: '/pedidos/nuevo' },
+  { icon: <Package size={18} />,  label: 'Pedidos',      path: '/pedidos' },
+  { icon: <Users size={18} />,    label: 'Clientes',     path: '/clientes' },
+  { icon: <Wallet size={18} />,   label: 'Caja',         path: '/caja' },
+]
+
+const STATS = [
+  {
+    label: 'Pedidos de hoy',
+    value: 5,
+    icon: <Clock size={32} className="text-blue-500" />,
+    iconBg: 'bg-blue-50',
+    border: 'border-blue-100',
+  },
+  {
+    label: 'Listos para entregar',
+    value: 3,
+    icon: <CheckCircle2 size={32} className="text-green-500" />,
+    iconBg: 'bg-green-50',
+    border: 'border-green-100',
+  },
+  {
+    label: 'Saldo pendiente',
+    value: '$240',
+    icon: <DollarSign size={32} className="text-amber-500" />,
+    iconBg: 'bg-amber-50',
+    border: 'border-amber-100',
+  },
+]
+
+const QUICK_LINKS = [
+  { label: 'Ver Pedidos', path: '/pedidos',  icon: <Package size={26} />, color: 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border-indigo-100' },
+  { label: 'Clientes',    path: '/clientes', icon: <Users size={26} />,   color: 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100' },
+  { label: 'Caja',        path: '/caja',     icon: <Wallet size={26} />,  color: 'text-amber-600 bg-amber-50 hover:bg-amber-100 border-amber-100' },
+]
+
 function RecepcionistaPage() {
-  return <div>Recepcionista</div>
+  const navigate = useNavigate()
+
+  const today = new Date().toLocaleDateString('es-MX', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+
+  return (
+    <MainLayout navLinks={NAV_LINKS} userName="Ana García" userRole="Recepcionista">
+      {/* flex col + h-full para que las secciones llenen el alto disponible */}
+      <div className="flex flex-col h-full gap-5">
+
+        {/* Encabezado */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Bienvenida, Ana García</h1>
+          <p className="text-sm text-gray-400 mt-0.5 capitalize">{today}</p>
+        </div>
+
+        {/* Nuevo Pedido — tarjeta destacada, crece para ocupar espacio */}
+        <div className="flex-1 bg-indigo-600 rounded-2xl p-7 text-white shadow-lg flex items-center justify-between gap-6 min-h-[140px]">
+          <div className="flex items-center gap-5">
+            <div className="bg-indigo-500 p-4 rounded-2xl shrink-0">
+              <FilePlus size={40} className="text-white" />
+            </div>
+            <div>
+              <p className="text-indigo-200 text-xs font-semibold uppercase tracking-widest mb-1">
+                Acción principal
+              </p>
+              <h2 className="text-3xl font-extrabold leading-tight">Nuevo Pedido</h2>
+              <p className="text-indigo-200 text-sm mt-1">
+                Registra un nuevo pedido de lavandería
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate('/pedidos/nuevo')}
+            className="shrink-0 flex items-center gap-2 bg-white text-indigo-600 font-bold px-7 py-4 rounded-2xl hover:bg-indigo-50 active:scale-95 transition-all text-lg shadow-md"
+          >
+            Crear pedido
+            <ArrowRight size={20} />
+          </button>
+        </div>
+
+        {/* Stats — tarjetas medianas */}
+        <div className="grid grid-cols-3 gap-4 flex-1 min-h-[120px]">
+          {STATS.map((stat) => (
+            <div
+              key={stat.label}
+              className={`bg-white rounded-2xl p-6 shadow-sm border ${stat.border} flex flex-col justify-between`}
+            >
+              <div className={`${stat.iconBg} p-3 rounded-xl w-fit`}>
+                {stat.icon}
+              </div>
+              <div>
+                <p className="text-4xl font-extrabold text-gray-800 mt-3">{stat.value}</p>
+                <p className="text-sm text-gray-500 mt-1 leading-tight">{stat.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Accesos rápidos — botones grandes táctiles */}
+        <div className="grid grid-cols-3 gap-4 flex-1 min-h-[100px]">
+          {QUICK_LINKS.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className={`flex flex-col items-center justify-center gap-3 ${item.color} font-semibold rounded-2xl transition-colors active:scale-95 border text-base`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+
+      </div>
+    </MainLayout>
+  )
 }
 
 export default RecepcionistaPage
