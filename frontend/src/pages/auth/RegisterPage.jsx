@@ -1,31 +1,42 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import RoleCard from '../../components/ui/RoleCard'
-import FormInput from '../../components/ui/FormInput'
-import PasswordInput from '../../components/ui/PasswordInput'
+import { UserCheck, Shirt, ShieldCheck, Eye, EyeOff } from 'lucide-react'
 import api from '../../services/api'
+import './RegisterPage.css'
 
 const ROLES = [
-  {
-    role: 'RECEPCIONISTA',
-    label: 'Recepcionista',
-    icon: 'UserCheck',
-    description: 'Registro de pedidos y atención al cliente',
-  },
-  {
-    role: 'OPERADOR',
-    label: 'Operador',
-    icon: 'Shirt',
-    description: 'Actualización de estados de prendas',
-  },
-  {
-    role: 'ADMIN',
-    label: 'Admin',
-    icon: 'ShieldCheck',
-    description: 'Acceso total al sistema',
-  },
+  { role: 'RECEPCIONISTA', label: 'Recepcionista', Icon: UserCheck, description: 'Atención al cliente' },
+  { role: 'OPERADOR',      label: 'Operador',       Icon: Shirt,      description: 'Estados de prendas' },
+  { role: 'ADMIN',         label: 'Admin',           Icon: ShieldCheck, description: 'Acceso total' },
 ]
+
+function PasswordField({ id, label, placeholder, error, registration }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="form-group">
+      <label htmlFor={id}>{label}</label>
+      <div className="password-wrapper">
+        <input
+          id={id}
+          type={show ? 'text' : 'password'}
+          className="form-input"
+          placeholder={placeholder}
+          {...registration}
+        />
+        <button
+          type="button"
+          className="password-toggle"
+          onClick={() => setShow((v) => !v)}
+          aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+        >
+          {show ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+      {error && <span className="form-error">{error}</span>}
+    </div>
+  )
+}
 
 function RegisterPage() {
   const navigate = useNavigate()
@@ -42,10 +53,6 @@ function RegisterPage() {
   const password = watch('password')
   const selectedRole = watch('role')
 
-  const handleRoleSelect = (role) => {
-    setValue('role', role, { shouldValidate: true })
-  }
-
   const onSubmit = async ({ fullName, email, password, role }) => {
     setServerError('')
     try {
@@ -58,102 +65,107 @@ function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Crear cuenta</h1>
-        <p className="text-sm text-gray-500 mb-6">
-          Sistema de gestión de lavandería y tintorería
-        </p>
+    <div className="register-container">
+      <div className="register-card glass-panel">
+        <div className="register-header">
+          <div className="register-logo">💧</div>
+          <h1>Crear cuenta</h1>
+          <p>Sistema de gestión de lavandería y tintorería</p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-          <FormInput
-            label="Nombre completo"
-            type="text"
-            placeholder="Ej. María González"
-            error={errors.fullName?.message}
-            {...register('fullName', {
-              required: 'El nombre es obligatorio',
-              minLength: { value: 3, message: 'Mínimo 3 caracteres' },
-            })}
-          />
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="register-form">
+          <div className="form-group">
+            <label htmlFor="fullName">Nombre completo</label>
+            <input
+              id="fullName"
+              type="text"
+              className="form-input"
+              placeholder="Ej. María González"
+              {...register('fullName', {
+                required: 'El nombre es obligatorio',
+                minLength: { value: 3, message: 'Mínimo 3 caracteres' },
+              })}
+            />
+            {errors.fullName && <span className="form-error">{errors.fullName.message}</span>}
+          </div>
 
-          <FormInput
-            label="Correo electrónico"
-            type="email"
-            placeholder="correo@ejemplo.com"
-            error={errors.email?.message}
-            {...register('email', {
-              required: 'El correo es obligatorio',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Ingresa un correo válido',
-              },
-            })}
-          />
+          <div className="form-group">
+            <label htmlFor="email">Correo electrónico</label>
+            <input
+              id="email"
+              type="email"
+              className="form-input"
+              placeholder="correo@ejemplo.com"
+              {...register('email', {
+                required: 'El correo es obligatorio',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Ingresa un correo válido',
+                },
+              })}
+            />
+            {errors.email && <span className="form-error">{errors.email.message}</span>}
+          </div>
 
-          <PasswordInput
+          <PasswordField
+            id="password"
             label="Contraseña"
             placeholder="Mínimo 6 caracteres"
             error={errors.password?.message}
-            {...register('password', {
+            registration={register('password', {
               required: 'La contraseña es obligatoria',
               minLength: { value: 6, message: 'Mínimo 6 caracteres' },
             })}
           />
 
-          <PasswordInput
+          <PasswordField
+            id="confirmPassword"
             label="Confirmar contraseña"
             placeholder="Repite tu contraseña"
             error={errors.confirmPassword?.message}
-            {...register('confirmPassword', {
+            registration={register('confirmPassword', {
               required: 'Confirma tu contraseña',
               validate: (v) => v === password || 'Las contraseñas no coinciden',
             })}
           />
 
-          {/* Hidden input keeps react-hook-form in sync with role selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Rol en el sistema
-            </label>
-            <input
-              type="hidden"
-              {...register('role', { required: 'Selecciona un rol' })}
-            />
-            <div className="grid grid-cols-3 gap-3">
-              {ROLES.map((r) => (
-                <RoleCard
-                  key={r.role}
-                  {...r}
-                  selected={selectedRole === r.role}
-                  onSelect={handleRoleSelect}
-                />
+          <div className="form-group">
+            <label>Rol en el sistema</label>
+            <input type="hidden" {...register('role', { required: 'Selecciona un rol' })} />
+            <div className="role-grid">
+              {ROLES.map(({ role, label, Icon, description }) => (
+                <button
+                  key={role}
+                  type="button"
+                  className={`role-card ${selectedRole === role ? 'selected' : ''}`}
+                  onClick={() => setValue('role', role, { shouldValidate: true })}
+                >
+                  <Icon size={28} strokeWidth={1.5} />
+                  <span className="role-card-label">{label}</span>
+                  <span className="role-card-desc">{description}</span>
+                </button>
               ))}
             </div>
-            {errors.role && (
-              <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
-            )}
+            {errors.role && <span className="form-error">{errors.role.message}</span>}
           </div>
 
-          {serverError && (
-            <p className="text-sm text-red-600 text-center">{serverError}</p>
-          )}
+          {serverError && <p className="register-server-error">{serverError}</p>}
 
           <button
             type="submit"
             disabled={!isValid || isSubmitting}
-            className="w-full rounded-xl bg-indigo-600 py-3 text-base font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn-primary register-btn"
           >
             {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <div className="register-footer">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="font-medium text-indigo-600 hover:underline">
+          <Link to="/login" className="register-link">
             Iniciar sesión
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   )
