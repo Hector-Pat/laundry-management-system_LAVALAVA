@@ -1,24 +1,26 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import RoleCard from '../../components/ui/RoleCard'
 import FormInput from '../../components/ui/FormInput'
 import PasswordInput from '../../components/ui/PasswordInput'
+import api from '../../services/api'
 
 const ROLES = [
   {
-    role: 'recepcionista',
+    role: 'RECEPCIONISTA',
     label: 'Recepcionista',
     icon: 'UserCheck',
     description: 'Registro de pedidos y atención al cliente',
   },
   {
-    role: 'operador',
+    role: 'OPERADOR',
     label: 'Operador',
     icon: 'Shirt',
     description: 'Actualización de estados de prendas',
   },
   {
-    role: 'admin',
+    role: 'ADMIN',
     label: 'Admin',
     icon: 'ShieldCheck',
     description: 'Acceso total al sistema',
@@ -26,12 +28,15 @@ const ROLES = [
 ]
 
 function RegisterPage() {
+  const navigate = useNavigate()
+  const [serverError, setServerError] = useState('')
+
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm({ mode: 'onChange' })
 
   const password = watch('password')
@@ -41,9 +46,15 @@ function RegisterPage() {
     setValue('role', role, { shouldValidate: true })
   }
 
-  const onSubmit = (data) => {
-    // Mock submit — replace with registerService() when backend is ready
-    console.log(data)
+  const onSubmit = async ({ fullName, email, password, role }) => {
+    setServerError('')
+    try {
+      await api.post('/api/auth/register', { fullName, email, password, role })
+      navigate('/login', { state: { registered: true } })
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Error al crear la cuenta'
+      setServerError(msg)
+    }
   }
 
   return (
@@ -82,11 +93,11 @@ function RegisterPage() {
 
           <PasswordInput
             label="Contraseña"
-            placeholder="Mínimo 8 caracteres"
+            placeholder="Mínimo 6 caracteres"
             error={errors.password?.message}
             {...register('password', {
               required: 'La contraseña es obligatoria',
-              minLength: { value: 8, message: 'Mínimo 8 caracteres' },
+              minLength: { value: 6, message: 'Mínimo 6 caracteres' },
             })}
           />
 
@@ -124,12 +135,16 @@ function RegisterPage() {
             )}
           </div>
 
+          {serverError && (
+            <p className="text-sm text-red-600 text-center">{serverError}</p>
+          )}
+
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
             className="w-full rounded-xl bg-indigo-600 py-3 text-base font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Crear cuenta
+            {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
         </form>
 

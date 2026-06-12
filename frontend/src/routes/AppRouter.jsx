@@ -19,17 +19,17 @@ function AppRouter() {
         <Route path="/register" element={<RegisterPage />} />
 
         <Route path="/admin" element={
-          <ProtectedRoute roles={['admin']}>
+          <ProtectedRoute roles={['ADMIN']}>
             <AdminPage />
           </ProtectedRoute>
         } />
         <Route path="/operador" element={
-          <ProtectedRoute roles={['operador']}>
+          <ProtectedRoute roles={['OPERADOR']}>
             <OperadorPage />
           </ProtectedRoute>
         } />
         <Route path="/recepcionista" element={
-          <ProtectedRoute roles={['recepcionista']}>
+          <ProtectedRoute roles={['RECEPCIONISTA']}>
             <RecepcionistaPage />
           </ProtectedRoute>
         } />

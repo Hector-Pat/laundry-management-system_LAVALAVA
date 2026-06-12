@@ -115,3 +115,13 @@
   color: var(--accent-primary-hover);
   text-decoration: underline;
 }
+
+.login-success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid var(--status-success);
+  color: var(--status-success);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  text-align: center;
+}

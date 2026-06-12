@@ -1,29 +1,40 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import api from '../../services/api'
 import './LoginPage.css'
 
 const ROLE_ROUTES = {
-  admin: '/admin',
-  operador: '/operador',
-  recepcionista: '/recepcionista',
+  ADMIN: '/admin',
+  RECEPCIONISTA: '/recepcionista',
+  OPERADOR: '/operador',
+  CLIENT: '/dashboard',
 }
 
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const { state } = useLocation()
+  const [serverError, setServerError] = useState('')
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm({ mode: 'onChange' })
 
-  const onSubmit = ({ email }) => {
-    // Mock auth — replace with loginService() when backend is ready
-    const mockUser = { email, role: 'admin', username: email.split('@')[0] }
-    login(mockUser)
-    navigate('/dashboard') // Route to new dashboard for demonstration
+  const onSubmit = async ({ email, password }) => {
+    setServerError('')
+    try {
+      const { data } = await api.post('/api/auth/login', { email, password })
+      const { token, user } = data.data
+      login(user, token)
+      navigate(ROLE_ROUTES[user.role] ?? '/dashboard')
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Error al iniciar sesión'
+      setServerError(msg)
+    }
   }
 
   return (
@@ -34,6 +45,10 @@ function LoginPage() {
           <h1>Welcome to LAVALAVA</h1>
           <p>Sign in to manage your laundry operations</p>
         </div>
+
+        {state?.registered && (
+          <p className="login-success">Cuenta creada. Iniciá sesión.</p>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="login-form">
           <div className="form-group">
@@ -63,18 +78,20 @@ function LoginPage() {
               placeholder="••••••••"
               {...register('password', {
                 required: 'Password is required',
-                minLength: { value: 8, message: 'Minimum 8 characters' },
+                minLength: { value: 6, message: 'Minimum 6 characters' },
               })}
             />
             {errors.password && <span className="form-error">{errors.password.message}</span>}
           </div>
 
+          {serverError && <p className="form-error">{serverError}</p>}
+
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
             className="btn-primary login-btn"
           >
-            Sign In
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
