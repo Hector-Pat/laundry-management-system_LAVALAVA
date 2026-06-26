@@ -37,6 +37,12 @@ function validateRegisterData(data) {
         throw error;
     }
 
+    if (role === USER_ROLES.ADMIN) {
+        const error = new Error('Admin accounts cannot be created through public registration');
+        error.statusCode = 403;
+        throw error;
+    }
+
     return {
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),

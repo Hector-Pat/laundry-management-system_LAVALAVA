@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { UserCheck, Shirt, ShieldCheck, Eye, EyeOff } from 'lucide-react'
+import { UserCheck, Shirt, Eye, EyeOff } from 'lucide-react'
 import api from '../../services/api'
 import './RegisterPage.css'
 
 const ROLES = [
   { role: 'RECEPCIONISTA', label: 'Recepcionista', Icon: UserCheck, description: 'Atención al cliente' },
   { role: 'OPERADOR',      label: 'Operador',       Icon: Shirt,      description: 'Estados de prendas' },
-  { role: 'ADMIN',         label: 'Admin',           Icon: ShieldCheck, description: 'Acceso total' },
 ]
 
 function PasswordField({ id, label, placeholder, error, registration }) {
