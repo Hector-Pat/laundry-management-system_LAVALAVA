@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Layout from '../../components/Layout';
 import './PedidosPage.css';
 
 function PedidosPage() {
@@ -21,6 +22,7 @@ function PedidosPage() {
   };
 
   return (
+    <Layout>
     <div className="orders-container">
       <div className="orders-header">
         <div>
@@ -89,6 +91,7 @@ function PedidosPage() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
 

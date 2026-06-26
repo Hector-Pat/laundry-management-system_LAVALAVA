@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
 import {
   FilePlus,
   Package,
@@ -50,6 +51,12 @@ const QUICK_LINKS = [
 
 function RecepcionistaPage() {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   const today = new Date().toLocaleDateString('es-MX', {
     weekday: 'long',
@@ -59,13 +66,13 @@ function RecepcionistaPage() {
   })
 
   return (
-    <MainLayout navLinks={NAV_LINKS} userName="Ana García" userRole="Recepcionista">
+    <MainLayout navLinks={NAV_LINKS} userName={user?.fullName} userRole={user?.role} onLogout={handleLogout}>
       {/* flex col + h-full para que las secciones llenen el alto disponible */}
       <div className="flex flex-col h-full gap-5">
 
         {/* Encabezado */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Bienvenida, Ana García</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Bienvenido, {user?.fullName}</h1>
           <p className="text-sm text-gray-400 mt-0.5 capitalize">{today}</p>
         </div>
 

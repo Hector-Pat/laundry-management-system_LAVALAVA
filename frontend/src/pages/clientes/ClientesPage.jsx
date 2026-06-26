@@ -1,5 +1,11 @@
+import Layout from '../../components/Layout';
+
 function ClientesPage() {
-  return <div>Clientes</div>
+  return (
+    <Layout>
+      <div>Clientes</div>
+    </Layout>
+  )
 }
 
 export default ClientesPage

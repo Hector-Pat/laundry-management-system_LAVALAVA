@@ -1,10 +1,12 @@
 import { useAuth } from '../../hooks/useAuth';
+import Layout from '../../components/Layout';
 import './DashboardPage.css';
 
 function DashboardPage() {
   const { user } = useAuth();
 
   return (
+    <Layout>
     <div className="dashboard-container">
       <div className="dashboard-header">
         <div>
@@ -59,6 +61,7 @@ function DashboardPage() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
 
