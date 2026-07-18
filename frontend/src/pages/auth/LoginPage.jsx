@@ -42,27 +42,27 @@ function LoginPage() {
       <div className="login-card glass-panel">
         <div className="login-header">
           <div className="login-logo">💧</div>
-          <h1>Welcome to LAVALAVA</h1>
-          <p>Sign in to manage your laundry operations</p>
+          <h1>Bienvenido a LAVALAVA</h1>
+          <p>Inicia sesión para gestionar tu lavandería</p>
         </div>
 
         {state?.registered && (
-          <p className="login-success">Cuenta creada. Iniciá sesión.</p>
+          <p className="login-success">Cuenta creada. Inicia sesión.</p>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="login-form">
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Correo electrónico</label>
             <input
               id="email"
               type="email"
               className="form-input"
-              placeholder="name@example.com"
+              placeholder="nombre@ejemplo.com"
               {...register('email', {
-                required: 'Email is required',
+                required: 'El correo es obligatorio',
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Enter a valid email address',
+                  message: 'Ingresa un correo válido',
                 },
               })}
             />
@@ -70,15 +70,15 @@ function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               id="password"
               type="password"
               className="form-input"
               placeholder="••••••••"
               {...register('password', {
-                required: 'Password is required',
-                minLength: { value: 6, message: 'Minimum 6 characters' },
+                required: 'La contraseña es obligatoria',
+                minLength: { value: 6, message: 'Mínimo 6 caracteres' },
               })}
             />
             {errors.password && <span className="form-error">{errors.password.message}</span>}
@@ -91,14 +91,14 @@ function LoginPage() {
             disabled={!isValid || isSubmitting}
             className="btn-primary login-btn"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
         </form>
 
         <div className="login-footer">
-          Don't have an account?{' '}
+          ¿No tienes cuenta?{' '}
           <Link to="/register" className="login-link">
-            Create an account
+            Crear una cuenta
           </Link>
         </div>
       </div>
