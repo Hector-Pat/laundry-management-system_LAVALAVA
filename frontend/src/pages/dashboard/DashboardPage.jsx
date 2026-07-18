@@ -1,12 +1,20 @@
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import Layout from '../../components/Layout';
+import MainLayout from '../../components/layout/MainLayout';
+import { getNavLinks } from '../../components/layout/navLinks';
 import './DashboardPage.css';
 
 function DashboardPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <Layout>
+    <MainLayout navLinks={getNavLinks(user?.role)} userName={user?.fullName} userRole={user?.role} onLogout={handleLogout}>
     <div className="dashboard-container">
       <div className="dashboard-header">
         <div>
@@ -61,7 +69,7 @@ function DashboardPage() {
         </div>
       </div>
     </div>
-    </Layout>
+    </MainLayout>
   );
 }
 

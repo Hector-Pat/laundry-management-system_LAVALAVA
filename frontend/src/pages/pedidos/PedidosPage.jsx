@@ -1,9 +1,19 @@
 import { useState } from 'react';
-import Layout from '../../components/Layout';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import MainLayout from '../../components/layout/MainLayout';
+import { getNavLinks } from '../../components/layout/navLinks';
 import './PedidosPage.css';
 
 function PedidosPage() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('All');
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const orders = [
     { id: 'ORD-1025', customer: 'Alice Smith', phone: '+1 234-567-8900', items: 3, total: '$45.00', status: 'Washing', date: 'Oct 24, 2023' },
@@ -22,7 +32,7 @@ function PedidosPage() {
   };
 
   return (
-    <Layout>
+    <MainLayout navLinks={getNavLinks(user?.role)} userName={user?.fullName} userRole={user?.role} onLogout={handleLogout}>
     <div className="orders-container">
       <div className="orders-header">
         <div>
@@ -91,7 +101,7 @@ function PedidosPage() {
         </div>
       </div>
     </div>
-    </Layout>
+    </MainLayout>
   );
 }
 
