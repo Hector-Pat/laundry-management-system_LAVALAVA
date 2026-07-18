@@ -19,7 +19,7 @@ function Layout({ children }) {
   ];
 
   // Add role-specific links
-  if (user?.role === 'admin') {
+  if (user?.role === 'ADMIN') {
     navLinks.push({ path: '/admin', label: 'Admin', icon: '⚙️' });
   }
 
@@ -46,9 +46,9 @@ function Layout({ children }) {
 
         <div className="sidebar-footer">
           <div className="user-info">
-            <div className="avatar">{user?.username?.charAt(0).toUpperCase() || 'U'}</div>
+            <div className="avatar">{user?.fullName?.charAt(0).toUpperCase() || 'U'}</div>
             <div className="user-details">
-              <span className="user-name">{user?.username || 'User'}</span>
+              <span className="user-name">{user?.fullName || 'User'}</span>
               <span className="user-role">{user?.role || 'Staff'}</span>
             </div>
           </div>
