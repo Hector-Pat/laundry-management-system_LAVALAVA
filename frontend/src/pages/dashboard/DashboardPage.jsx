@@ -10,7 +10,7 @@ function DashboardPage() {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <div>
-          <h1>Welcome back, {user?.username || 'User'}! 👋</h1>
+          <h1>Welcome back, {user?.fullName || 'User'}! 👋</h1>
           <p style={{ color: 'var(--text-muted)' }}>Here's what's happening with your laundry business today.</p>
         </div>
         <button className="btn-primary">
