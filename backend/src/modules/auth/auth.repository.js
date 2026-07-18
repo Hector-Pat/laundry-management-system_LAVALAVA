@@ -1,14 +1,7 @@
 const pool = require('../../config/db');
 
 async function createUser(userData) {
-    const {
-        fullName,
-        email,
-        passwordHash,
-        phoneNumber,
-        birthDate,
-        role
-    } = userData;
+    const { fullName, email, passwordHash, phoneNumber, birthDate, role } = userData;
 
     const [result] = await pool.query(
         `INSERT INTO users 

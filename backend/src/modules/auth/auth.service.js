@@ -4,14 +4,7 @@ const { generateToken } = require('../../utils/token.util');
 const { USER_ROLES, USER_ROLE_VALUES } = require('../../constants/roles');
 
 function validateRegisterData(data) {
-    const {
-        fullName,
-        email,
-        password,
-        phoneNumber,
-        birthDate,
-        role
-    } = data;
+    const { fullName, email, password, phoneNumber, birthDate, role } = data;
 
     if (!fullName || !email || !password) {
         const error = new Error('Full name, email and password are required');

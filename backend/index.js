@@ -9,9 +9,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Backend corriendo OK' });
+    res.json({ message: 'Backend corriendo OK' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor en http://localhost:${PORT}`);
+    console.log(`Servidor en http://localhost:${PORT}`);
 });
