@@ -1,3 +1,4 @@
+const QRCode = require('qrcode');
 const pedidosRepository = require('./pedidos.repository');
 const clientesService = require('../clientes/clientes.service');
 const serviciosRepository = require('../servicios/servicios.repository');
@@ -91,6 +92,13 @@ async function buildItems(itemsPayload) {
     });
 }
 
+// El QR codifica el folio (no una URL): es lo unico que un usuario necesita
+// para identificar el pedido en mostrador, y no depende de en que dominio
+// este publicado el frontend. Se genera al vuelo, no se guarda en BD.
+async function buildQrCode(folio) {
+    return QRCode.toDataURL(folio, { margin: 1, width: 240 });
+}
+
 async function createPedido(payload, currentUser) {
     const clienteInput = parseClienteInput(payload.cliente);
     const items = await buildItems(payload.items);
@@ -103,7 +111,10 @@ async function createPedido(payload, currentUser) {
         createdBy: currentUser.id
     });
 
-    return pedidosRepository.findPedidoById(pedidoId);
+    const pedido = await pedidosRepository.findPedidoById(pedidoId);
+    const qrCode = await buildQrCode(pedido.folio);
+
+    return { ...pedido, qrCode };
 }
 
 async function getPedidoById(id) {
@@ -115,7 +126,9 @@ async function getPedidoById(id) {
         throw error;
     }
 
-    return pedido;
+    const qrCode = await buildQrCode(pedido.folio);
+
+    return { ...pedido, qrCode };
 }
 
 function parsePagination(query) {
