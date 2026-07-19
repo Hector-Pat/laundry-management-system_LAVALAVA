@@ -204,7 +204,10 @@ async function updateStatus(id, newStatus, currentUser) {
         }
     }
 
-    return pedidosRepository.updateStatus(pedidoId, newStatus);
+    const updated = await pedidosRepository.updateStatus(pedidoId, newStatus);
+    const qrCode = await buildQrCode(updated.folio);
+
+    return { ...updated, qrCode };
 }
 
 module.exports = {

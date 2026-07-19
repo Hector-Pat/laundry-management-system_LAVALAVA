@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 
 function Sidebar({ navLinks = [] }) {
   return (
-    <aside className="w-64 bg-gray-900 text-white flex flex-col shrink-0 h-full">
+    <aside className="w-64 bg-gray-900 text-white flex flex-col shrink-0 h-full print:hidden">
       <div className="px-6 py-5 border-b border-gray-700">
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Menú</p>
       </div>

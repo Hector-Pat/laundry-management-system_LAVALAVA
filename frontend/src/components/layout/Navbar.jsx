@@ -2,7 +2,7 @@ import { LogOut } from 'lucide-react'
 
 function Navbar({ userName = 'Ana García', userRole = 'Recepcionista', onLogout }) {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-3 flex items-center justify-between shrink-0">
+    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-3 flex items-center justify-between shrink-0 print:hidden">
       <span className="text-2xl font-extrabold text-indigo-600 tracking-widest">
         LAVALAVA
       </span>
