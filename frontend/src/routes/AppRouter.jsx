@@ -10,6 +10,8 @@ import DashboardPage from '../pages/dashboard/DashboardPage'
 import ClientesPage from '../pages/clientes/ClientesPage'
 import PedidosPage from '../pages/pedidos/PedidosPage'
 
+const PEDIDOS_STAFF_ROLES = ['RECEPCIONISTA', 'OPERADOR', 'ADMIN']
+
 function AppRouter() {
   return (
     <AuthProvider>
@@ -45,7 +47,7 @@ function AppRouter() {
           </ProtectedRoute>
         } />
         <Route path="/pedidos" element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={PEDIDOS_STAFF_ROLES}>
             <PedidosPage />
           </ProtectedRoute>
         } />
