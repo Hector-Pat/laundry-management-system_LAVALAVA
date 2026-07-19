@@ -9,8 +9,10 @@ import RecepcionistaPage from '../pages/recepcionista/RecepcionistaPage'
 import DashboardPage from '../pages/dashboard/DashboardPage'
 import ClientesPage from '../pages/clientes/ClientesPage'
 import PedidosPage from '../pages/pedidos/PedidosPage'
+import PedidoFormPage from '../pages/pedidos/PedidoFormPage'
 
 const PEDIDOS_STAFF_ROLES = ['RECEPCIONISTA', 'OPERADOR', 'ADMIN']
+const PEDIDOS_CREATE_ROLES = ['RECEPCIONISTA', 'ADMIN']
 
 function AppRouter() {
   return (
@@ -49,6 +51,11 @@ function AppRouter() {
         <Route path="/pedidos" element={
           <ProtectedRoute roles={PEDIDOS_STAFF_ROLES}>
             <PedidosPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/pedidos/nuevo" element={
+          <ProtectedRoute roles={PEDIDOS_CREATE_ROLES}>
+            <PedidoFormPage />
           </ProtectedRoute>
         } />
       </Routes>
