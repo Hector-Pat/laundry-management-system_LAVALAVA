@@ -40,8 +40,22 @@ async function getById(req, res, next) {
     }
 }
 
+async function updateStatus(req, res, next) {
+    try {
+        const pedido = await pedidosService.updateStatus(req.params.id, req.body.status, req.user);
+
+        return res.status(200).json({
+            message: 'Pedido status updated successfully',
+            data: pedido
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     create,
     list,
-    getById
+    getById,
+    updateStatus
 };

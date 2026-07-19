@@ -1,7 +1,8 @@
 const pedidosRepository = require('./pedidos.repository');
 const clientesService = require('../clientes/clientes.service');
 const serviciosRepository = require('../servicios/servicios.repository');
-const { ORDER_STATUS_VALUES } = require('../../constants/orderStatus');
+const { ORDER_STATUS_VALUES, ORDER_TRANSITIONS } = require('../../constants/orderStatus');
+const { USER_ROLES } = require('../../constants/roles');
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
@@ -148,9 +149,55 @@ async function listPedidos(query) {
     });
 }
 
+// Maquina de estados lineal (ver constants/orderStatus.js): cada rol solo
+// puede avanzar un pedido a su siguiente estado. ADMIN puede forzar
+// cualquier estado valido, para poder corregir un pedido mal capturado.
+async function updateStatus(id, newStatus, currentUser) {
+    const pedidoId = parseId(id);
+
+    if (!ORDER_STATUS_VALUES.includes(newStatus)) {
+        const error = new Error('Invalid status');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const pedido = await pedidosRepository.findPedidoById(pedidoId);
+
+    if (!pedido) {
+        const error = new Error('Pedido not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    if (pedido.status === 'ENTREGADO') {
+        const error = new Error('This pedido has already been delivered');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (currentUser.role !== USER_ROLES.ADMIN) {
+        const transition = ORDER_TRANSITIONS[pedido.status];
+
+        if (!transition || transition.next !== newStatus) {
+            const error = new Error(`Cannot change status from ${pedido.status} to ${newStatus}`);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (!transition.roles.includes(currentUser.role)) {
+            const error = new Error('You do not have permission to perform this status change');
+            error.statusCode = 403;
+            throw error;
+        }
+    }
+
+    return pedidosRepository.updateStatus(pedidoId, newStatus);
+}
+
 module.exports = {
     createPedido,
     getPedidoById,
     listPedidos,
+    updateStatus,
     parseId
 };
