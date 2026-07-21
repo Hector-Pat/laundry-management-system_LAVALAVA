@@ -1,0 +1,19 @@
+const PAYMENT_METHODS = Object.freeze({
+    EFECTIVO: 'EFECTIVO',
+    TARJETA: 'TARJETA',
+    TRANSFERENCIA: 'TRANSFERENCIA'
+});
+
+const PAYMENT_METHOD_VALUES = Object.values(PAYMENT_METHODS);
+
+const PAYMENT_TYPES = Object.freeze({
+    CONTADO: 'CONTADO',
+    ADELANTO: 'ADELANTO',
+    SALDO: 'SALDO'
+});
+
+module.exports = {
+    PAYMENT_METHODS,
+    PAYMENT_METHOD_VALUES,
+    PAYMENT_TYPES
+};

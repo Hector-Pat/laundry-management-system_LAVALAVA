@@ -1,5 +1,6 @@
 const express = require('express');
 const pedidosController = require('./pedidos.controller');
+const pagosController = require('../pagos/pagos.controller');
 const authenticateToken = require('../../middlewares/auth.middleware');
 const authorizeRoles = require('../../middlewares/role.middleware');
 const { USER_ROLES } = require('../../constants/roles');
@@ -33,6 +34,20 @@ router.patch(
     '/:id/estado',
     authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.OPERADOR, USER_ROLES.ADMIN),
     pedidosController.updateStatus
+);
+
+// Pagos (RF-06): solo quien cobra en mostrador registra o consulta el
+// desglose de pagos/saldo de un pedido.
+router.get(
+    '/:id/pagos',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN),
+    pagosController.list
+);
+
+router.post(
+    '/:id/pagos',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN),
+    pagosController.create
 );
 
 module.exports = router;

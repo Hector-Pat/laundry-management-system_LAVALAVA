@@ -99,3 +99,21 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
   FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 );
+
+-- Pagos de un pedido (RF-06). Puede haber varios registros por pedido: un
+-- adelanto al recibirlo y despues el saldo al entregarlo, o un solo pago de
+-- contado. El "type" se calcula en el backend a partir del saldo pendiente
+-- en el momento del pago, no lo decide quien lo registra.
+CREATE TABLE IF NOT EXISTS pagos (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  pedido_id     INT NOT NULL,
+  amount        DECIMAL(10,2) NOT NULL,
+  method        ENUM('EFECTIVO', 'TARJETA', 'TRANSFERENCIA') NOT NULL DEFAULT 'EFECTIVO',
+  type          ENUM('CONTADO', 'ADELANTO', 'SALDO') NOT NULL,
+  registered_by INT NOT NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
+  FOREIGN KEY (registered_by) REFERENCES users(id),
+  INDEX idx_pagos_pedido_id (pedido_id),
+  INDEX idx_pagos_created_at (created_at)
+);
