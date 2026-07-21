@@ -129,3 +129,20 @@ CREATE TABLE IF NOT EXISTS gastos (
   FOREIGN KEY (registered_by) REFERENCES users(id),
   INDEX idx_gastos_created_at (created_at)
 );
+
+-- Daños/reclamaciones de un pedido (RF-09), vinculadas tanto al pedido como
+-- al cliente para poder consultar el historial de reclamos de un cliente
+-- aunque cambie el pedido.
+CREATE TABLE IF NOT EXISTS reclamaciones (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  pedido_id     INT NOT NULL,
+  cliente_id    INT NOT NULL,
+  description   TEXT NOT NULL,
+  registered_by INT NOT NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
+  FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+  FOREIGN KEY (registered_by) REFERENCES users(id),
+  INDEX idx_reclamaciones_pedido_id (pedido_id),
+  INDEX idx_reclamaciones_cliente_id (cliente_id)
+);

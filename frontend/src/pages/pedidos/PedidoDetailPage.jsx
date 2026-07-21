@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Printer, Loader2, AlertCircle, CheckCircle2, Plus, X } from 'lucide-react'
+import { ArrowLeft, Printer, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidoById, updatePedidoStatus } from '../../services/pedidos.service'
 import { getPagos, registerPago } from '../../services/pagos.service'
+import { getReclamaciones, registerReclamacion } from '../../services/reclamaciones.service'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
 import { PAYMENT_METHOD_LABELS, PAYMENT_METHOD_VALUES, PAYMENT_TYPE_LABELS } from '../../constants/paymentMethods'
 import './PedidoDetailPage.css'
 
 const PAGOS_ROLES = ['RECEPCIONISTA', 'ADMIN']
+const RECLAMACIONES_ROLES = ['RECEPCIONISTA', 'OPERADOR', 'ADMIN']
 
 function formatCurrency(value) {
   return `$${Number(value).toFixed(2)}`
@@ -84,6 +86,31 @@ function PedidoDetailPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de pagos
     loadPagos()
   }, [loadPagos])
+
+  // Daños/reclamaciones (RF-09): cualquier miembro de piso puede reportarlos.
+  const canManageReclamaciones = RECLAMACIONES_ROLES.includes(user?.role)
+
+  const [reclamaciones, setReclamaciones] = useState([])
+  const [isLoadingReclamaciones, setIsLoadingReclamaciones] = useState(false)
+  const [showReclamacionModal, setShowReclamacionModal] = useState(false)
+
+  const loadReclamaciones = useCallback(async () => {
+    if (!canManageReclamaciones) return
+    setIsLoadingReclamaciones(true)
+    try {
+      const data = await getReclamaciones(id)
+      setReclamaciones(data)
+    } catch {
+      setReclamaciones([])
+    } finally {
+      setIsLoadingReclamaciones(false)
+    }
+  }, [id, canManageReclamaciones])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de reclamaciones
+    loadReclamaciones()
+  }, [loadReclamaciones])
 
   const transition = pedido ? ORDER_TRANSITIONS[pedido.status] : null
   const canAdvance =
@@ -293,6 +320,38 @@ function PedidoDetailPage() {
                 )}
               </div>
             )}
+
+            {canManageReclamaciones && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <h2 className="font-semibold text-gray-800">Daños y reclamaciones</h2>
+                  <button
+                    onClick={() => setShowReclamacionModal(true)}
+                    className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
+                  >
+                    <ShieldAlert size={16} />
+                    Reportar daño
+                  </button>
+                </div>
+
+                {isLoadingReclamaciones ? (
+                  <div className="flex items-center gap-2 text-gray-400 text-sm">
+                    <Loader2 size={16} className="animate-spin" /> Cargando reclamaciones...
+                  </div>
+                ) : reclamaciones.length === 0 ? (
+                  <p className="text-sm text-gray-400">No hay daños ni reclamaciones registrados.</p>
+                ) : (
+                  <div className="border border-gray-100 rounded-xl divide-y divide-gray-100">
+                    {reclamaciones.map((reclamacion) => (
+                      <div key={reclamacion.id} className="px-4 py-3">
+                        <p className="text-sm text-gray-800">{reclamacion.description}</p>
+                        <p className="text-xs text-gray-400 mt-1">{formatDateTime(reclamacion.createdAt)}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -305,6 +364,17 @@ function PedidoDetailPage() {
             const updated = await registerPago(id, payload)
             setPaymentSummary(updated)
             setShowPaymentModal(false)
+          }}
+        />
+      )}
+
+      {showReclamacionModal && (
+        <ReclamacionModal
+          onClose={() => setShowReclamacionModal(false)}
+          onSubmit={async (payload) => {
+            const created = await registerReclamacion(id, payload)
+            setReclamaciones((prev) => [created, ...prev])
+            setShowReclamacionModal(false)
           }}
         />
       )}
@@ -415,6 +485,80 @@ function PaymentModal({ saldoPendiente, onClose, onSubmit }) {
               type="submit"
               disabled={!isValidAmount || isSubmitting}
               className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+              Registrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function ReclamacionModal({ onClose, onSubmit }) {
+  const [description, setDescription] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const isValid = description.trim().length > 0
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isValid) return
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await onSubmit({ description: description.trim() })
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo registrar la reclamación')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 text-lg">Reportar daño o reclamación</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Descripción</label>
+            <textarea
+              autoFocus
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Ej. Mancha en camisa blanca detectada al planchar"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Registrar

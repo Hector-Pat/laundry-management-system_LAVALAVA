@@ -1,6 +1,7 @@
 const express = require('express');
 const pedidosController = require('./pedidos.controller');
 const pagosController = require('../pagos/pagos.controller');
+const reclamacionesController = require('../reclamaciones/reclamaciones.controller');
 const authenticateToken = require('../../middlewares/auth.middleware');
 const authorizeRoles = require('../../middlewares/role.middleware');
 const { USER_ROLES } = require('../../constants/roles');
@@ -48,6 +49,20 @@ router.post(
     '/:id/pagos',
     authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN),
     pagosController.create
+);
+
+// Daños/reclamaciones (RF-09): cualquier miembro de piso puede reportar uno,
+// ya sea al recibir el pedido o al detectarlo durante el proceso.
+router.get(
+    '/:id/reclamaciones',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.OPERADOR, USER_ROLES.ADMIN),
+    reclamacionesController.list
+);
+
+router.post(
+    '/:id/reclamaciones',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.OPERADOR, USER_ROLES.ADMIN),
+    reclamacionesController.create
 );
 
 module.exports = router;
