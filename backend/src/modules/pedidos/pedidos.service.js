@@ -2,8 +2,9 @@ const QRCode = require('qrcode');
 const pedidosRepository = require('./pedidos.repository');
 const clientesService = require('../clientes/clientes.service');
 const serviciosRepository = require('../servicios/servicios.repository');
-const { ORDER_STATUS_VALUES, ORDER_TRANSITIONS } = require('../../constants/orderStatus');
+const { ORDER_STATUSES, ORDER_STATUS_VALUES, ORDER_TRANSITIONS } = require('../../constants/orderStatus');
 const { USER_ROLES } = require('../../constants/roles');
+const { notifyPedidoListo } = require('../../utils/whatsappNotifier');
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
@@ -206,6 +207,18 @@ async function updateStatus(id, newStatus, currentUser) {
 
     const updated = await pedidosRepository.updateStatus(pedidoId, newStatus);
     const qrCode = await buildQrCode(updated.folio);
+
+    // Aviso al cliente (RF-04): no debe tumbar el cambio de estado si Twilio
+    // falla o no esta configurado, solo se deja constancia en el log.
+    if (newStatus === ORDER_STATUSES.LISTO) {
+        try {
+            await notifyPedidoListo(updated);
+        } catch (notifyError) {
+            console.warn(
+                `No se pudo notificar por WhatsApp el pedido ${updated.folio}: ${notifyError.message}`
+            );
+        }
+    }
 
     return { ...updated, qrCode };
 }
