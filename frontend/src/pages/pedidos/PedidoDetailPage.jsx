@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Printer, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert } from 'lucide-react'
+import { ArrowLeft, Printer, Receipt, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
@@ -112,6 +112,25 @@ function PedidoDetailPage() {
     loadReclamaciones()
   }, [loadReclamaciones])
 
+  // Ticket termico (RNF-02): "etiqueta" es la pegatina chica con QR, "ticket"
+  // es el comprobante completo con servicios y saldo. Solo uno se renderiza
+  // a la vez (ver bloques print:* mas abajo), y se imprime tras el
+  // re-render para que el bloque correcto ya este en el DOM.
+  const [printMode, setPrintMode] = useState('etiqueta')
+  const isFirstPrintRender = useRef(true)
+
+  useEffect(() => {
+    if (isFirstPrintRender.current) {
+      isFirstPrintRender.current = false
+      return undefined
+    }
+
+    const raf = requestAnimationFrame(() => window.print())
+    return () => cancelAnimationFrame(raf)
+  }, [printMode])
+
+  const handlePrint = (mode) => setPrintMode(mode)
+
   const transition = pedido ? ORDER_TRANSITIONS[pedido.status] : null
   const canAdvance =
     pedido &&
@@ -148,13 +167,22 @@ function PedidoDetailPage() {
           </Link>
 
           {pedido && (
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
-            >
-              <Printer size={16} />
-              Imprimir etiqueta
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePrint('etiqueta')}
+                className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              >
+                <Printer size={16} />
+                Imprimir etiqueta
+              </button>
+              <button
+                onClick={() => handlePrint('ticket')}
+                className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              >
+                <Receipt size={16} />
+                Imprimir ticket
+              </button>
+            </div>
           )}
         </div>
 
@@ -380,7 +408,7 @@ function PedidoDetailPage() {
       )}
 
       {/* Etiqueta imprimible: solo visible al imprimir (ver PedidoDetailPage.css) */}
-      {pedido && (
+      {pedido && printMode === 'etiqueta' && (
         <div className="hidden print:flex print:flex-col print:items-center print:gap-2 print:text-black">
           <p className="text-lg font-bold">LAVALAVA</p>
           <p className="text-2xl font-extrabold tracking-wide">{pedido.folio}</p>
@@ -388,6 +416,77 @@ function PedidoDetailPage() {
           <p className="text-sm font-semibold">{pedido.cliente.fullName}</p>
           <p className="text-xs">{formatDateTime(pedido.createdAt)}</p>
           <p className="text-sm font-bold">Total: {formatCurrency(pedido.total)}</p>
+        </div>
+      )}
+
+      {/* Ticket completo para impresora termica de 80mm (RNF-02): detalle de
+          servicios y saldo, no solo el folio. Ver estilos .print-ticket en
+          PedidoDetailPage.css */}
+      {pedido && printMode === 'ticket' && (
+        <div className="hidden print:block print:text-black print-ticket">
+          <p className="ticket-title">LAVALAVA</p>
+          <p className="ticket-sub">Ticket de pedido</p>
+
+          <div className="ticket-row">
+            <span>Folio</span>
+            <span>{pedido.folio}</span>
+          </div>
+          <div className="ticket-row">
+            <span>Fecha</span>
+            <span>{formatDateTime(pedido.createdAt)}</span>
+          </div>
+          <div className="ticket-row">
+            <span>Cliente</span>
+            <span>{pedido.cliente.fullName}</span>
+          </div>
+          <div className="ticket-row">
+            <span>Teléfono</span>
+            <span>{pedido.cliente.phoneNumber}</span>
+          </div>
+
+          <hr className="ticket-divider" />
+
+          <table className="ticket-items">
+            <thead>
+              <tr>
+                <th>Servicio</th>
+                <th>Cant</th>
+                <th>Subt.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pedido.items.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.servicioName}</td>
+                  <td>{item.quantity}</td>
+                  <td>{formatCurrency(item.subtotal)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <hr className="ticket-divider" />
+
+          <div className="ticket-row ticket-total">
+            <span>Total</span>
+            <span>{formatCurrency(pedido.total)}</span>
+          </div>
+
+          {paymentSummary && (
+            <>
+              <div className="ticket-row">
+                <span>Pagado</span>
+                <span>{formatCurrency(paymentSummary.totalPagado)}</span>
+              </div>
+              <div className="ticket-row">
+                <span>Saldo pendiente</span>
+                <span>{formatCurrency(paymentSummary.saldoPendiente)}</span>
+              </div>
+            </>
+          )}
+
+          <hr className="ticket-divider" />
+          <p className="ticket-footer">¡Gracias por tu preferencia!</p>
         </div>
       )}
     </MainLayout>
