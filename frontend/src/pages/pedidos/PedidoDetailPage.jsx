@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Printer, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Printer, Loader2, AlertCircle, CheckCircle2, Plus, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidoById, updatePedidoStatus } from '../../services/pedidos.service'
+import { getPagos, registerPago } from '../../services/pagos.service'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
+import { PAYMENT_METHOD_LABELS, PAYMENT_METHOD_VALUES, PAYMENT_TYPE_LABELS } from '../../constants/paymentMethods'
 import './PedidoDetailPage.css'
+
+const PAGOS_ROLES = ['RECEPCIONISTA', 'ADMIN']
 
 function formatCurrency(value) {
   return `$${Number(value).toFixed(2)}`
@@ -54,6 +58,32 @@ function PedidoDetailPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial del detalle
     loadPedido()
   }, [loadPedido])
+
+  // Pagos (RF-06): solo RECEPCIONISTA/ADMIN pueden cobrar, asi que solo para
+  // ellos se pide el desglose (el backend rechazaria la llamada para OPERADOR).
+  const canManagePagos = PAGOS_ROLES.includes(user?.role)
+
+  const [paymentSummary, setPaymentSummary] = useState(null)
+  const [isLoadingPayments, setIsLoadingPayments] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+
+  const loadPagos = useCallback(async () => {
+    if (!canManagePagos) return
+    setIsLoadingPayments(true)
+    try {
+      const data = await getPagos(id)
+      setPaymentSummary(data)
+    } catch {
+      setPaymentSummary(null)
+    } finally {
+      setIsLoadingPayments(false)
+    }
+  }, [id, canManagePagos])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de pagos
+    loadPagos()
+  }, [loadPagos])
 
   const transition = pedido ? ORDER_TRANSITIONS[pedido.status] : null
   const canAdvance =
@@ -203,9 +233,81 @@ function PedidoDetailPage() {
                 </div>
               </div>
             </div>
+
+            {canManagePagos && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <h2 className="font-semibold text-gray-800">Pagos</h2>
+                  {paymentSummary && paymentSummary.saldoPendiente > 0 && (
+                    <button
+                      onClick={() => setShowPaymentModal(true)}
+                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
+                    >
+                      <Plus size={16} />
+                      Registrar pago
+                    </button>
+                  )}
+                </div>
+
+                {isLoadingPayments ? (
+                  <div className="flex items-center gap-2 text-gray-400 text-sm">
+                    <Loader2 size={16} className="animate-spin" /> Cargando pagos...
+                  </div>
+                ) : paymentSummary ? (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="bg-gray-50 rounded-xl px-4 py-3">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total</p>
+                        <p className="text-lg font-bold text-gray-800">{formatCurrency(paymentSummary.total)}</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl px-4 py-3">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Pagado</p>
+                        <p className="text-lg font-bold text-green-600">{formatCurrency(paymentSummary.totalPagado)}</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl px-4 py-3">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Saldo pendiente</p>
+                        <p className={`text-lg font-bold ${paymentSummary.saldoPendiente > 0 ? 'text-amber-600' : 'text-gray-800'}`}>
+                          {formatCurrency(paymentSummary.saldoPendiente)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {paymentSummary.pagos.length > 0 && (
+                      <div className="border border-gray-100 rounded-xl divide-y divide-gray-100">
+                        {paymentSummary.pagos.map((pago) => (
+                          <div key={pago.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                            <div>
+                              <span className="font-semibold text-gray-800">{formatCurrency(pago.amount)}</span>
+                              <span className="text-gray-400 ml-2">
+                                {PAYMENT_TYPE_LABELS[pago.type]} · {PAYMENT_METHOD_LABELS[pago.method]}
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-400">{formatDateTime(pago.createdAt)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400">No se pudo cargar la información de pagos.</p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {showPaymentModal && (
+        <PaymentModal
+          saldoPendiente={paymentSummary?.saldoPendiente ?? 0}
+          onClose={() => setShowPaymentModal(false)}
+          onSubmit={async (payload) => {
+            const updated = await registerPago(id, payload)
+            setPaymentSummary(updated)
+            setShowPaymentModal(false)
+          }}
+        />
+      )}
 
       {/* Etiqueta imprimible: solo visible al imprimir (ver PedidoDetailPage.css) */}
       {pedido && (
@@ -219,6 +321,108 @@ function PedidoDetailPage() {
         </div>
       )}
     </MainLayout>
+  )
+}
+
+function PaymentModal({ saldoPendiente, onClose, onSubmit }) {
+  const [amount, setAmount] = useState(String(saldoPendiente))
+  const [method, setMethod] = useState('EFECTIVO')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const parsedAmount = Number(amount)
+  const isValidAmount = Number.isFinite(parsedAmount) && parsedAmount > 0 && parsedAmount <= saldoPendiente
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isValidAmount) return
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await onSubmit({ amount: parsedAmount, method })
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo registrar el pago')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 text-lg">Registrar pago</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-500">
+          Saldo pendiente: <span className="font-semibold text-gray-800">{formatCurrency(saldoPendiente)}</span>
+        </p>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Monto</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0.01"
+              max={saldoPendiente}
+              autoFocus
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            {!isValidAmount && amount !== '' && (
+              <p className="text-xs text-red-500 mt-1">
+                El monto debe ser mayor a 0 y no exceder el saldo pendiente ({formatCurrency(saldoPendiente)}).
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Método de pago</label>
+            <select
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {PAYMENT_METHOD_VALUES.map((value) => (
+                <option key={value} value={value}>
+                  {PAYMENT_METHOD_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={!isValidAmount || isSubmitting}
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+              Registrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
 
