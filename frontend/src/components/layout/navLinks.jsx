@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings } from 'lucide-react'
+import { LayoutDashboard, Package, Users, Settings, Wallet } from 'lucide-react'
 
 export function getNavLinks(role) {
   const links = [
@@ -6,6 +6,10 @@ export function getNavLinks(role) {
     { icon: <Package size={18} />, label: 'Pedidos', path: '/pedidos' },
     { icon: <Users size={18} />, label: 'Clientes', path: '/clientes' },
   ]
+
+  if (role === 'RECEPCIONISTA' || role === 'ADMIN') {
+    links.push({ icon: <Wallet size={18} />, label: 'Caja', path: '/caja' })
+  }
 
   if (role === 'ADMIN') {
     links.push({ icon: <Settings size={18} />, label: 'Admin', path: '/admin' })
