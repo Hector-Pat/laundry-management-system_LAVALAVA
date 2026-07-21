@@ -117,3 +117,15 @@ CREATE TABLE IF NOT EXISTS pagos (
   INDEX idx_pagos_pedido_id (pedido_id),
   INDEX idx_pagos_created_at (created_at)
 );
+
+-- Egresos de caja (RF-08): gastos de operacion del dia (insumos, mantenimiento,
+-- etc.) que se restan de los pagos cobrados para sacar el corte de caja.
+CREATE TABLE IF NOT EXISTS gastos (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  concept       VARCHAR(150) NOT NULL,
+  amount        DECIMAL(10,2) NOT NULL,
+  registered_by INT NOT NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (registered_by) REFERENCES users(id),
+  INDEX idx_gastos_created_at (created_at)
+);

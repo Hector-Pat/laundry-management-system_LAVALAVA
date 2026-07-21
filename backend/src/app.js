@@ -6,6 +6,7 @@ const usersRoutes = require('./modules/users/users.routes');
 const clientesRoutes = require('./modules/clientes/clientes.routes');
 const serviciosRoutes = require('./modules/servicios/servicios.routes');
 const pedidosRoutes = require('./modules/pedidos/pedidos.routes');
+const cajaRoutes = require('./modules/caja/caja.routes');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/servicios', serviciosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
+app.use('/api/caja', cajaRoutes);
 
 app.get('/api/health', (req, res) => {
     return res.status(200).json({
