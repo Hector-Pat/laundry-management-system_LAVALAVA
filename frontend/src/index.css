@@ -56,12 +56,19 @@ a {
   color: inherit;
 }
 
-button {
-  font-family: inherit;
-  border: none;
-  cursor: pointer;
-  background: none;
-  outline: none;
+/* En @layer base para que las utilidades de Tailwind (bg-*, etc.), que
+   viven en @layer utilities, sigan ganando: una regla sin capa le gana a
+   cualquier regla con capa sin importar el orden o la especificidad, y
+   esta quedaba fuera de cualquier capa, dejando sin fondo a todos los
+   <button> que usan una clase bg-* de Tailwind. */
+@layer base {
+  button {
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+    background: none;
+    outline: none;
+  }
 }
 
 /* Utilities */
