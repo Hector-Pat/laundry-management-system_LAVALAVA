@@ -12,6 +12,7 @@ import PedidosPage from '../pages/pedidos/PedidosPage'
 import PedidoFormPage from '../pages/pedidos/PedidoFormPage'
 import PedidoDetailPage from '../pages/pedidos/PedidoDetailPage'
 import CajaPage from '../pages/caja/CajaPage'
+import ServiciosPage from '../pages/servicios/ServiciosPage'
 
 const PEDIDOS_STAFF_ROLES = ['RECEPCIONISTA', 'OPERADOR', 'ADMIN']
 const PEDIDOS_CREATE_ROLES = ['RECEPCIONISTA', 'ADMIN']
@@ -69,6 +70,11 @@ function AppRouter() {
         <Route path="/caja" element={
           <ProtectedRoute roles={CAJA_ROLES}>
             <CajaPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/servicios" element={
+          <ProtectedRoute roles={['ADMIN']}>
+            <ServiciosPage />
           </ProtectedRoute>
         } />
       </Routes>

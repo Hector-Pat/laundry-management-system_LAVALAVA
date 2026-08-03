@@ -6,8 +6,11 @@ const { USER_ROLES } = require('../../constants/roles');
 
 const router = express.Router();
 
-router.use(authenticateToken, authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN));
+router.use(authenticateToken);
 
-router.get('/', serviciosController.list);
+router.get('/', authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN), serviciosController.list);
+router.get('/admin', authorizeRoles(USER_ROLES.ADMIN), serviciosController.listAll);
+router.post('/', authorizeRoles(USER_ROLES.ADMIN), serviciosController.create);
+router.patch('/:id', authorizeRoles(USER_ROLES.ADMIN), serviciosController.update);
 
 module.exports = router;
