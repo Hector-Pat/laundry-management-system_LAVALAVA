@@ -67,6 +67,12 @@ router.post(
     pagosController.create
 );
 
+router.patch(
+    '/:id/pagos/:pagoId/anular',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN),
+    pagosController.voidPayment
+);
+
 // Daños/reclamaciones (RF-09): cualquier miembro de piso puede reportar uno,
 // ya sea al recibir el pedido o al detectarlo durante el proceso.
 router.get(

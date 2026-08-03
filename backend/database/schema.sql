@@ -118,8 +118,14 @@ CREATE TABLE IF NOT EXISTS pagos (
   type          ENUM('CONTADO', 'ADELANTO', 'SALDO') NOT NULL,
   registered_by INT NOT NULL,
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  -- Anulacion: el pago queda como historial, no se borra.
+  is_voided     BOOLEAN NOT NULL DEFAULT FALSE,
+  voided_at     DATETIME NULL,
+  voided_by     INT NULL,
+  void_reason   VARCHAR(255) NULL,
   FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
   FOREIGN KEY (registered_by) REFERENCES users(id),
+  FOREIGN KEY (voided_by) REFERENCES users(id),
   INDEX idx_pagos_pedido_id (pedido_id),
   INDEX idx_pagos_created_at (created_at)
 );

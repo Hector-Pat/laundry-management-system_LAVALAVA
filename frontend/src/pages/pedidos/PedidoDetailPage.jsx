@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidoById, updatePedidoStatus, cancelPedido } from '../../services/pedidos.service'
-import { getPagos, registerPago } from '../../services/pagos.service'
+import { getPagos, registerPago, voidPago } from '../../services/pagos.service'
 import { getReclamaciones, registerReclamacion } from '../../services/reclamaciones.service'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
 import { PAYMENT_METHOD_LABELS, PAYMENT_METHOD_VALUES, PAYMENT_TYPE_LABELS } from '../../constants/paymentMethods'
@@ -69,6 +69,7 @@ function PedidoDetailPage() {
   const [paymentSummary, setPaymentSummary] = useState(null)
   const [isLoadingPayments, setIsLoadingPayments] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [voidingPago, setVoidingPago] = useState(null)
 
   const loadPagos = useCallback(async () => {
     if (!canManagePagos) return
@@ -369,14 +370,36 @@ function PedidoDetailPage() {
                     {paymentSummary.pagos.length > 0 && (
                       <div className="border border-gray-100 rounded-xl divide-y divide-gray-100">
                         {paymentSummary.pagos.map((pago) => (
-                          <div key={pago.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                          <div
+                            key={pago.id}
+                            className={`flex items-center justify-between px-4 py-2.5 text-sm gap-3 ${
+                              pago.isVoided ? 'opacity-50' : ''
+                            }`}
+                          >
                             <div>
-                              <span className="font-semibold text-gray-800">{formatCurrency(pago.amount)}</span>
+                              <span
+                                className={`font-semibold ${pago.isVoided ? 'text-gray-500 line-through' : 'text-gray-800'}`}
+                              >
+                                {formatCurrency(pago.amount)}
+                              </span>
                               <span className="text-gray-400 ml-2">
                                 {PAYMENT_TYPE_LABELS[pago.type]} · {PAYMENT_METHOD_LABELS[pago.method]}
                               </span>
+                              {pago.isVoided && (
+                                <p className="text-xs text-red-500 mt-0.5">Anulado: {pago.voidReason}</p>
+                              )}
                             </div>
-                            <span className="text-xs text-gray-400">{formatDateTime(pago.createdAt)}</span>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-xs text-gray-400">{formatDateTime(pago.createdAt)}</span>
+                              {!pago.isVoided && (
+                                <button
+                                  onClick={() => setVoidingPago(pago)}
+                                  className="text-xs font-medium text-red-500 hover:text-red-700"
+                                >
+                                  Anular
+                                </button>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -442,6 +465,18 @@ function PedidoDetailPage() {
             const created = await registerReclamacion(id, payload)
             setReclamaciones((prev) => [created, ...prev])
             setShowReclamacionModal(false)
+          }}
+        />
+      )}
+
+      {voidingPago && (
+        <VoidPagoModal
+          pago={voidingPago}
+          onClose={() => setVoidingPago(null)}
+          onSubmit={async (reason) => {
+            const updated = await voidPago(id, voidingPago.id, reason)
+            setPaymentSummary(updated)
+            setVoidingPago(null)
           }}
         />
       )}
@@ -711,6 +746,85 @@ function ReclamacionModal({ onClose, onSubmit }) {
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Registrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function VoidPagoModal({ pago, onClose, onSubmit }) {
+  const [reason, setReason] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const isValid = reason.trim().length > 0
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isValid) return
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await onSubmit(reason.trim())
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo anular el pago')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 text-lg">Anular pago</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-500">
+          Monto: <span className="font-semibold text-gray-800">{formatCurrency(pago.amount)}</span> del{' '}
+          {formatDateTime(pago.createdAt)}
+        </p>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Motivo de la anulación</label>
+            <textarea
+              autoFocus
+              rows={4}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Ej. Monto capturado por error"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+            >
+              Volver
+            </button>
+            <button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+              Anular pago
             </button>
           </div>
         </form>

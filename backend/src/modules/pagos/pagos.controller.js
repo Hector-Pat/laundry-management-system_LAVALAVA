@@ -26,7 +26,26 @@ async function create(req, res, next) {
     }
 }
 
+async function voidPayment(req, res, next) {
+    try {
+        const summary = await pagosService.voidPayment(
+            req.params.id,
+            req.params.pagoId,
+            req.body.reason,
+            req.user
+        );
+
+        return res.status(200).json({
+            message: 'Payment voided successfully',
+            data: summary
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     list,
-    create
+    create,
+    voidPayment
 };

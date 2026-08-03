@@ -7,3 +7,7 @@ export function getPagos(pedidoId) {
 export function registerPago(pedidoId, payload) {
   return api.post(`/api/pedidos/${pedidoId}/pagos`, payload).then((res) => res.data.data)
 }
+
+export function voidPago(pedidoId, pagoId, reason) {
+  return api.patch(`/api/pedidos/${pedidoId}/pagos/${pagoId}/anular`, { reason }).then((res) => res.data.data)
+}
