@@ -100,6 +100,9 @@ async function findPedidoById(id) {
             p.created_at AS createdAt,
             p.updated_at AS updatedAt,
             p.delivered_at AS deliveredAt,
+            p.cancelled_at AS cancelledAt,
+            p.cancelled_by AS cancelledBy,
+            p.cancel_reason AS cancelReason,
             c.id AS clienteId,
             c.full_name AS clienteFullName,
             c.phone_number AS clientePhoneNumber,
@@ -139,6 +142,9 @@ async function findPedidoById(id) {
         createdAt: pedido.createdAt,
         updatedAt: pedido.updatedAt,
         deliveredAt: pedido.deliveredAt,
+        cancelledAt: pedido.cancelledAt,
+        cancelledBy: pedido.cancelledBy,
+        cancelReason: pedido.cancelReason,
         cliente: {
             id: pedido.clienteId,
             fullName: pedido.clienteFullName,
@@ -191,6 +197,7 @@ async function listPedidos({ status, date, clienteId, cliente, page, pageSize })
             p.status,
             p.total,
             p.created_at AS createdAt,
+            p.cancelled_at AS cancelledAt,
             c.id AS clienteId,
             c.full_name AS clienteFullName,
             c.phone_number AS clientePhoneNumber
@@ -209,6 +216,7 @@ async function listPedidos({ status, date, clienteId, cliente, page, pageSize })
             status: row.status,
             total: row.total,
             createdAt: row.createdAt,
+            cancelledAt: row.cancelledAt,
             cliente: {
                 id: row.clienteId,
                 fullName: row.clienteFullName,
@@ -229,7 +237,7 @@ async function listPedidos({ status, date, clienteId, cliente, page, pageSize })
 // (p.ej. dos pagos a la vez) no puedan leer el mismo saldo y pisarse.
 async function lockPedidoById(id, connection) {
     const [rows] = await connection.query(
-        `SELECT id, total, status FROM pedidos WHERE id = ? FOR UPDATE`,
+        `SELECT id, total, status, cancelled_at AS cancelledAt FROM pedidos WHERE id = ? FOR UPDATE`,
         [id]
     );
 
@@ -247,10 +255,22 @@ async function updateStatus(id, status) {
     return findPedidoById(id);
 }
 
+async function cancelPedido(id, reason, cancelledBy) {
+    await pool.query(
+        `UPDATE pedidos
+        SET cancelled_at = NOW(), cancelled_by = ?, cancel_reason = ?
+        WHERE id = ?`,
+        [cancelledBy, reason, id]
+    );
+
+    return findPedidoById(id);
+}
+
 module.exports = {
     createPedidoWithItems,
     findPedidoById,
     lockPedidoById,
     listPedidos,
-    updateStatus
+    updateStatus,
+    cancelPedido
 };

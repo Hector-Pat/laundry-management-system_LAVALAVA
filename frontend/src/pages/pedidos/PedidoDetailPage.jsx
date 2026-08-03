@@ -4,7 +4,7 @@ import { ArrowLeft, Printer, Receipt, Loader2, AlertCircle, CheckCircle2, Plus, 
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
-import { getPedidoById, updatePedidoStatus } from '../../services/pedidos.service'
+import { getPedidoById, updatePedidoStatus, cancelPedido } from '../../services/pedidos.service'
 import { getPagos, registerPago } from '../../services/pagos.service'
 import { getReclamaciones, registerReclamacion } from '../../services/reclamaciones.service'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
@@ -13,6 +13,7 @@ import './PedidoDetailPage.css'
 
 const PAGOS_ROLES = ['RECEPCIONISTA', 'ADMIN']
 const RECLAMACIONES_ROLES = ['RECEPCIONISTA', 'OPERADOR', 'ADMIN']
+const CANCEL_ROLES = ['RECEPCIONISTA', 'ADMIN']
 
 function formatCurrency(value) {
   return `$${Number(value).toFixed(2)}`
@@ -134,9 +135,15 @@ function PedidoDetailPage() {
   const transition = pedido ? ORDER_TRANSITIONS[pedido.status] : null
   const canAdvance =
     pedido &&
+    !pedido.cancelledAt &&
     pedido.status !== 'ENTREGADO' &&
     transition &&
     (user?.role === 'ADMIN' || transition.roles.includes(user?.role))
+
+  const canCancel =
+    pedido && !pedido.cancelledAt && pedido.status !== 'ENTREGADO' && CANCEL_ROLES.includes(user?.role)
+
+  const [showCancelModal, setShowCancelModal] = useState(false)
 
   const handleAdvance = async () => {
     if (!transition) return
@@ -213,12 +220,19 @@ function PedidoDetailPage() {
 
               <div className="flex flex-col items-start md:items-end gap-2">
                 <span
-                  className={`inline-flex px-3 py-1.5 rounded-full text-sm font-semibold ${ORDER_STATUS_COLORS[pedido.status]}`}
+                  className={`inline-flex px-3 py-1.5 rounded-full text-sm font-semibold ${
+                    pedido.cancelledAt ? 'bg-red-50 text-red-600' : ORDER_STATUS_COLORS[pedido.status]
+                  }`}
                 >
-                  {ORDER_STATUS_LABELS[pedido.status]}
+                  {pedido.cancelledAt ? 'Cancelado' : ORDER_STATUS_LABELS[pedido.status]}
                 </span>
 
-                {pedido.status === 'ENTREGADO' ? (
+                {pedido.cancelledAt ? (
+                  <p className="text-xs text-gray-400 text-right max-w-xs">
+                    Cancelado el {formatDateTime(pedido.cancelledAt)}
+                    {pedido.cancelReason ? `: ${pedido.cancelReason}` : ''}
+                  </p>
+                ) : pedido.status === 'ENTREGADO' ? (
                   <p className="text-xs text-gray-400 inline-flex items-center gap-1">
                     <CheckCircle2 size={14} className="text-green-500" />
                     Entregado el {formatDateTime(pedido.deliveredAt)}
@@ -235,6 +249,15 @@ function PedidoDetailPage() {
                       : `Avanzar a ${ORDER_STATUS_LABELS[transition.next]}`}
                   </button>
                 ) : null}
+
+                {canCancel && (
+                  <button
+                    onClick={() => setShowCancelModal(true)}
+                    className="text-xs font-medium text-red-500 hover:text-red-700"
+                  >
+                    Cancelar pedido
+                  </button>
+                )}
               </div>
             </div>
 
@@ -293,7 +316,7 @@ function PedidoDetailPage() {
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <h2 className="font-semibold text-gray-800">Pagos</h2>
-                  {paymentSummary && paymentSummary.saldoPendiente > 0 && (
+                  {paymentSummary && paymentSummary.saldoPendiente > 0 && !pedido.cancelledAt && (
                     <button
                       onClick={() => setShowPaymentModal(true)}
                       className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
@@ -403,6 +426,17 @@ function PedidoDetailPage() {
             const created = await registerReclamacion(id, payload)
             setReclamaciones((prev) => [created, ...prev])
             setShowReclamacionModal(false)
+          }}
+        />
+      )}
+
+      {showCancelModal && (
+        <CancelModal
+          onClose={() => setShowCancelModal(false)}
+          onSubmit={async (reason) => {
+            const updated = await cancelPedido(id, reason)
+            setPedido(updated)
+            setShowCancelModal(false)
           }}
         />
       )}
@@ -661,6 +695,85 @@ function ReclamacionModal({ onClose, onSubmit }) {
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Registrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function CancelModal({ onClose, onSubmit }) {
+  const [reason, setReason] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const isValid = reason.trim().length > 0
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isValid) return
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await onSubmit(reason.trim())
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo cancelar el pedido')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 text-lg">Cancelar pedido</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-500">
+          Esta acción no reembolsa pagos ya registrados automáticamente. Si el pedido tiene pagos, anúlalos por
+          separado si aplica.
+        </p>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Motivo de la cancelación</label>
+            <textarea
+              autoFocus
+              rows={4}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Ej. El cliente ya no requiere el servicio"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+            >
+              Volver
+            </button>
+            <button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+              Cancelar pedido
             </button>
           </div>
         </form>

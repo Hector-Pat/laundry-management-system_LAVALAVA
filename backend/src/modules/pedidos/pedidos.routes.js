@@ -37,6 +37,14 @@ router.patch(
     pedidosController.updateStatus
 );
 
+// Cancelar pedido: no reembolsa pagos automaticamente, ver comentario en
+// pedidos.service.js::cancelPedido.
+router.patch(
+    '/:id/cancelar',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN),
+    pedidosController.cancel
+);
+
 // Pagos (RF-06): solo quien cobra en mostrador registra o consulta el
 // desglose de pagos/saldo de un pedido.
 router.get(

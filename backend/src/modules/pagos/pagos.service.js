@@ -101,6 +101,12 @@ async function registerPayment(id, payload, currentUser) {
             throw error;
         }
 
+        if (pedido.cancelledAt) {
+            const error = new Error('This pedido has been cancelled');
+            error.statusCode = 400;
+            throw error;
+        }
+
         const totalPagado = round2(await pagosRepository.sumByPedidoId(pedidoId, connection));
         const saldoPendiente = round2(Number(pedido.total) - totalPagado);
 

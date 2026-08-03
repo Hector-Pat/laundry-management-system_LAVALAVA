@@ -15,3 +15,7 @@ export function createPedido(payload) {
 export function updatePedidoStatus(id, status) {
   return api.patch(`/api/pedidos/${id}/estado`, { status }).then((res) => res.data.data)
 }
+
+export function cancelPedido(id, reason) {
+  return api.patch(`/api/pedidos/${id}/cancelar`, { reason }).then((res) => res.data.data)
+}

@@ -189,6 +189,12 @@ async function updateStatus(id, newStatus, currentUser) {
         throw error;
     }
 
+    if (pedido.cancelledAt) {
+        const error = new Error('This pedido has been cancelled');
+        error.statusCode = 400;
+        throw error;
+    }
+
     if (currentUser.role !== USER_ROLES.ADMIN) {
         const transition = ORDER_TRANSITIONS[pedido.status];
 
@@ -223,10 +229,51 @@ async function updateStatus(id, newStatus, currentUser) {
     return { ...updated, qrCode };
 }
 
+// Cancelar no es una transicion mas de la maquina de estados (ver
+// orderStatus.js): puede pasar desde cualquier estado no terminal, no solo
+// desde el "anterior" en la cadena RECIBIDO->...->ENTREGADO. No reembolsa
+// pagos ya registrados automaticamente; para eso esta la anulacion manual
+// de pagos (pagos.service.js::voidPayment).
+async function cancelPedido(id, reason, currentUser) {
+    const pedidoId = parseId(id);
+
+    if (typeof reason !== 'string' || !reason.trim()) {
+        const error = new Error('reason is required');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const pedido = await pedidosRepository.findPedidoById(pedidoId);
+
+    if (!pedido) {
+        const error = new Error('Pedido not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    if (pedido.cancelledAt) {
+        const error = new Error('This pedido has already been cancelled');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (pedido.status === ORDER_STATUSES.ENTREGADO) {
+        const error = new Error('This pedido has already been delivered');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const updated = await pedidosRepository.cancelPedido(pedidoId, reason.trim(), currentUser.id);
+    const qrCode = await buildQrCode(updated.folio);
+
+    return { ...updated, qrCode };
+}
+
 module.exports = {
     createPedido,
     getPedidoById,
     listPedidos,
     updateStatus,
+    cancelPedido,
     parseId
 };

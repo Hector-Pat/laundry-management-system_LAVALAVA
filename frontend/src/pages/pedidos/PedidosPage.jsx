@@ -204,9 +204,11 @@ function PedidosPage() {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${ORDER_STATUS_COLORS[pedido.status]}`}
+                          className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            pedido.cancelledAt ? 'bg-red-50 text-red-600' : ORDER_STATUS_COLORS[pedido.status]
+                          }`}
                         >
-                          {ORDER_STATUS_LABELS[pedido.status]}
+                          {pedido.cancelledAt ? 'Cancelado' : ORDER_STATUS_LABELS[pedido.status]}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-semibold text-gray-800">{formatCurrency(pedido.total)}</td>

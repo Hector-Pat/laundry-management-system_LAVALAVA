@@ -79,8 +79,14 @@ CREATE TABLE IF NOT EXISTS pedidos (
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   delivered_at  TIMESTAMP NULL,
+  -- Cancelacion (no es un ORDER_STATUS mas: puede pasar desde cualquier
+  -- estado no terminal, y no rompe la maquina lineal de estados).
+  cancelled_at  DATETIME NULL,
+  cancelled_by  INT NULL,
+  cancel_reason VARCHAR(255) NULL,
   FOREIGN KEY (cliente_id) REFERENCES clientes(id),
   FOREIGN KEY (created_by) REFERENCES users(id),
+  FOREIGN KEY (cancelled_by) REFERENCES users(id),
   INDEX idx_pedidos_status (status),
   INDEX idx_pedidos_created_at (created_at)
 );
