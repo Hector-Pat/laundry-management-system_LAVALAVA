@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Loader2, Plus, ChevronLeft, ChevronRight, AlertCircle, Pencil, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
@@ -251,7 +251,11 @@ function ClientesPage() {
                 <tbody className="divide-y divide-gray-100">
                   {clientes.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-800">{item.fullName}</td>
+                      <td className="px-6 py-4 font-medium text-gray-800">
+                        <Link to={`/clientes/${item.id}`} className="text-indigo-600 hover:text-indigo-800">
+                          {item.fullName}
+                        </Link>
+                      </td>
                       <td className="px-6 py-4 text-gray-500">{item.phoneNumber}</td>
                       <td className="px-6 py-4 text-gray-500">{item.email || '—'}</td>
                       <td className="px-6 py-4 text-gray-500">{formatDateTime(item.createdAt)}</td>

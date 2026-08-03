@@ -8,6 +8,7 @@ import OperadorPage from '../pages/operador/OperadorPage'
 import RecepcionistaPage from '../pages/recepcionista/RecepcionistaPage'
 import DashboardPage from '../pages/dashboard/DashboardPage'
 import ClientesPage from '../pages/clientes/ClientesPage'
+import ClienteDetailPage from '../pages/clientes/ClienteDetailPage'
 import PedidosPage from '../pages/pedidos/PedidosPage'
 import PedidoFormPage from '../pages/pedidos/PedidoFormPage'
 import PedidoDetailPage from '../pages/pedidos/PedidoDetailPage'
@@ -53,6 +54,11 @@ function AppRouter() {
         <Route path="/clientes" element={
           <ProtectedRoute roles={RECEPCION_ADMIN_ROLES}>
             <ClientesPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/clientes/:id" element={
+          <ProtectedRoute roles={RECEPCION_ADMIN_ROLES}>
+            <ClienteDetailPage />
           </ProtectedRoute>
         } />
         <Route path="/pedidos" element={
