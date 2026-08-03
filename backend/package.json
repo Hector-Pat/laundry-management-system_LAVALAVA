@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon src/server.js",
+        "test": "jest",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
@@ -27,7 +28,9 @@
         "eslint": "^10.7.0",
         "eslint-config-prettier": "^10.1.8",
         "globals": "^17.7.0",
+        "jest": "^30.4.2",
         "nodemon": "^3.1.14",
-        "prettier": "^3.9.5"
+        "prettier": "^3.9.5",
+        "supertest": "^7.2.2"
     }
 }

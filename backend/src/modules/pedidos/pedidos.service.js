@@ -223,10 +223,11 @@ async function updateStatus(id, newStatus, currentUser) {
         throw error;
     }
 
+    // "Normal" = el siguiente estado que le tocaria objetivamente al pedido
+    // (sin importar el rol: un ADMIN avanzando al siguiente estado esperado
+    // no es forzar nada, solo un salto fuera de esa secuencia lo es).
     const transition = ORDER_TRANSITIONS[pedido.status];
-    const isNormalTransition = Boolean(
-        transition && transition.next === newStatus && transition.roles.includes(currentUser.role)
-    );
+    const isNormalTransition = Boolean(transition && transition.next === newStatus);
 
     if (currentUser.role !== USER_ROLES.ADMIN) {
         if (!transition || transition.next !== newStatus) {
