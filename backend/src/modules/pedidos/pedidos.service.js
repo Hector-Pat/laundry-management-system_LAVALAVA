@@ -5,6 +5,7 @@ const clientesRepository = require('../clientes/clientes.repository');
 const serviciosRepository = require('../servicios/servicios.repository');
 const pagosRepository = require('../pagos/pagos.repository');
 const authRepository = require('../auth/auth.repository');
+const auditoriaService = require('../auditoria/auditoria.service');
 const { ORDER_STATUSES, ORDER_STATUS_VALUES, ORDER_TRANSITIONS } = require('../../constants/orderStatus');
 const { USER_ROLES } = require('../../constants/roles');
 const { notifyPedidoListo } = require('../../utils/whatsappNotifier');
@@ -222,9 +223,12 @@ async function updateStatus(id, newStatus, currentUser) {
         throw error;
     }
 
-    if (currentUser.role !== USER_ROLES.ADMIN) {
-        const transition = ORDER_TRANSITIONS[pedido.status];
+    const transition = ORDER_TRANSITIONS[pedido.status];
+    const isNormalTransition = Boolean(
+        transition && transition.next === newStatus && transition.roles.includes(currentUser.role)
+    );
 
+    if (currentUser.role !== USER_ROLES.ADMIN) {
         if (!transition || transition.next !== newStatus) {
             const error = new Error(`Cannot change status from ${pedido.status} to ${newStatus}`);
             error.statusCode = 400;
@@ -240,6 +244,19 @@ async function updateStatus(id, newStatus, currentUser) {
 
     const updated = await pedidosRepository.updateStatus(pedidoId, newStatus);
     const qrCode = await buildQrCode(updated.folio);
+
+    // ADMIN puede saltarse la maquina de estados; deja constancia solo
+    // cuando de verdad la salto (no en un avance normal hecho por un ADMIN).
+    if (currentUser.role === USER_ROLES.ADMIN && !isNormalTransition) {
+        try {
+            await auditoriaService.logAction(currentUser, 'FORZAR_ESTADO_PEDIDO', 'pedido', pedidoId, {
+                from: pedido.status,
+                to: newStatus
+            });
+        } catch (auditError) {
+            console.warn(`No se pudo registrar en la bitacora el forzado de estado del pedido ${pedidoId}: ${auditError.message}`);
+        }
+    }
 
     // Aviso al cliente (RF-04): no debe tumbar el cambio de estado si Twilio
     // falla o no esta configurado, solo se deja constancia en el log.
@@ -334,6 +351,14 @@ async function cancelPedido(id, reason, currentUser) {
 
     const updated = await pedidosRepository.cancelPedido(pedidoId, reason.trim(), currentUser.id);
     const qrCode = await buildQrCode(updated.folio);
+
+    try {
+        await auditoriaService.logAction(currentUser, 'CANCELAR_PEDIDO', 'pedido', pedidoId, {
+            reason: reason.trim()
+        });
+    } catch (auditError) {
+        console.warn(`No se pudo registrar en la bitacora la cancelacion del pedido ${pedidoId}: ${auditError.message}`);
+    }
 
     return { ...updated, qrCode };
 }

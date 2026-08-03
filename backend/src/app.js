@@ -8,6 +8,7 @@ const serviciosRoutes = require('./modules/servicios/servicios.routes');
 const pedidosRoutes = require('./modules/pedidos/pedidos.routes');
 const cajaRoutes = require('./modules/caja/caja.routes');
 const reclamacionesRoutes = require('./modules/reclamaciones/reclamaciones.routes');
+const auditoriaRoutes = require('./modules/auditoria/auditoria.routes');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/api/servicios', serviciosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/caja', cajaRoutes);
 app.use('/api/reclamaciones', reclamacionesRoutes);
+app.use('/api/auditoria', auditoriaRoutes);
 
 app.get('/api/health', (req, res) => {
     return res.status(200).json({

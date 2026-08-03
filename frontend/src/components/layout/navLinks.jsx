@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, Wallet, Shirt, ShieldAlert } from 'lucide-react'
+import { LayoutDashboard, Package, Users, Settings, Wallet, Shirt, ShieldAlert, ScrollText } from 'lucide-react'
 
 export function getNavLinks(role) {
   // CLIENT tiene su propio portal: no ve pedidos/clientes de mostrador.
@@ -20,6 +20,7 @@ export function getNavLinks(role) {
 
   if (role === 'ADMIN') {
     links.push({ icon: <Shirt size={18} />, label: 'Servicios', path: '/servicios' })
+    links.push({ icon: <ScrollText size={18} />, label: 'Auditoría', path: '/auditoria' })
     links.push({ icon: <Settings size={18} />, label: 'Admin', path: '/admin' })
   }
 

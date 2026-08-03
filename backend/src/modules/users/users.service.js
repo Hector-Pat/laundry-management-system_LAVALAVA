@@ -1,6 +1,7 @@
 const usersRepository = require('./users.repository');
 const { hashPassword } = require('../../utils/password.util');
 const { USER_ROLE_VALUES } = require('../../constants/roles');
+const auditoriaService = require('../auditoria/auditoria.service');
 
 async function listUsers() {
     return usersRepository.listUsers();
@@ -154,7 +155,22 @@ async function updateUser(id, updates, currentUser) {
         throw error;
     }
 
-    return usersRepository.updateUser(userId, changes);
+    const updated = await usersRepository.updateUser(userId, changes);
+
+    if (changes.role !== undefined || changes.isActive !== undefined) {
+        try {
+            await auditoriaService.logAction(currentUser, 'ACTUALIZAR_USUARIO', 'user', userId, {
+                role: changes.role !== undefined ? { from: existingUser.role, to: changes.role } : undefined,
+                isActive: changes.isActive !== undefined
+                    ? { from: existingUser.isActive, to: changes.isActive }
+                    : undefined
+            });
+        } catch (auditError) {
+            console.warn(`No se pudo registrar en la bitacora la actualizacion del usuario ${userId}: ${auditError.message}`);
+        }
+    }
+
+    return updated;
 }
 
 async function deactivateUser(id, currentUser) {
@@ -174,7 +190,15 @@ async function deactivateUser(id, currentUser) {
         throw error;
     }
 
-    return usersRepository.deleteUser(userId);
+    const deactivated = await usersRepository.deleteUser(userId);
+
+    try {
+        await auditoriaService.logAction(currentUser, 'DESACTIVAR_USUARIO', 'user', userId, {});
+    } catch (auditError) {
+        console.warn(`No se pudo registrar en la bitacora la desactivacion del usuario ${userId}: ${auditError.message}`);
+    }
+
+    return deactivated;
 }
 
 module.exports = {

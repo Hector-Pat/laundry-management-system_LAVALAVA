@@ -165,3 +165,18 @@ CREATE TABLE IF NOT EXISTS reclamaciones (
   INDEX idx_reclamaciones_cliente_id (cliente_id),
   INDEX idx_reclamaciones_status (status)
 );
+
+-- Bitacora de acciones sensibles (forzar estado de pedido, cancelar pedido,
+-- anular pago, resolver reclamacion, cambiar rol/estado de un usuario).
+CREATE TABLE IF NOT EXISTS audit_log (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  user_id       INT NULL,
+  action        VARCHAR(100) NOT NULL,
+  entity_type   VARCHAR(50) NOT NULL,
+  entity_id     INT NOT NULL,
+  details       JSON NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  INDEX idx_audit_log_created_at (created_at),
+  INDEX idx_audit_log_entity (entity_type, entity_id)
+);

@@ -1,6 +1,7 @@
 const pool = require('../../config/db');
 const pagosRepository = require('./pagos.repository');
 const pedidosRepository = require('../pedidos/pedidos.repository');
+const auditoriaService = require('../auditoria/auditoria.service');
 const { PAYMENT_METHOD_VALUES, PAYMENT_TYPES } = require('../../constants/paymentMethods');
 
 function parseId(id, label = 'id') {
@@ -201,6 +202,15 @@ async function voidPayment(id, pagoId, reason, currentUser) {
         throw error;
     } finally {
         connection.release();
+    }
+
+    try {
+        await auditoriaService.logAction(currentUser, 'ANULAR_PAGO', 'pago', parsedPagoId, {
+            pedidoId,
+            reason: reason.trim()
+        });
+    } catch (auditError) {
+        console.warn(`No se pudo registrar en la bitacora la anulacion del pago ${parsedPagoId}: ${auditError.message}`);
     }
 
     return getPaymentSummary(pedidoId);

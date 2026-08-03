@@ -1,5 +1,6 @@
 const reclamacionesRepository = require('./reclamaciones.repository');
 const pedidosRepository = require('../pedidos/pedidos.repository');
+const auditoriaService = require('../auditoria/auditoria.service');
 
 function parseId(id, label = 'id') {
     const parsed = Number(id);
@@ -77,7 +78,18 @@ async function resolveReclamacion(id, reclamacionId, payload, currentUser) {
         throw error;
     }
 
-    return reclamacionesRepository.resolve(parsedReclamacionId, notes, currentUser.id);
+    const resolved = await reclamacionesRepository.resolve(parsedReclamacionId, notes, currentUser.id);
+
+    try {
+        await auditoriaService.logAction(currentUser, 'RESOLVER_RECLAMACION', 'reclamacion', parsedReclamacionId, {
+            pedidoId,
+            resolutionNotes: notes
+        });
+    } catch (auditError) {
+        console.warn(`No se pudo registrar en la bitacora la resolucion de la reclamacion ${parsedReclamacionId}: ${auditError.message}`);
+    }
+
+    return resolved;
 }
 
 const DEFAULT_PAGE_SIZE = 20;
