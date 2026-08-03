@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import {
@@ -11,37 +12,9 @@ import {
   DollarSign,
 } from 'lucide-react'
 import MainLayout from '../../components/layout/MainLayout'
-
-const NAV_LINKS = [
-  { icon: <FilePlus size={18} />, label: 'Nuevo Pedido', path: '/pedidos/nuevo' },
-  { icon: <Package size={18} />,  label: 'Pedidos',      path: '/pedidos' },
-  { icon: <Users size={18} />,    label: 'Clientes',     path: '/clientes' },
-  { icon: <Wallet size={18} />,   label: 'Caja',         path: '/caja' },
-]
-
-const STATS = [
-  {
-    label: 'Pedidos de hoy',
-    value: 5,
-    icon: <Clock size={32} className="text-blue-500" />,
-    iconBg: 'bg-blue-50',
-    border: 'border-blue-100',
-  },
-  {
-    label: 'Listos para entregar',
-    value: 3,
-    icon: <CheckCircle2 size={32} className="text-green-500" />,
-    iconBg: 'bg-green-50',
-    border: 'border-green-100',
-  },
-  {
-    label: 'Saldo pendiente',
-    value: '$240',
-    icon: <DollarSign size={32} className="text-amber-500" />,
-    iconBg: 'bg-amber-50',
-    border: 'border-amber-100',
-  },
-]
+import { getNavLinks } from '../../components/layout/navLinks'
+import { getPedidos } from '../../services/pedidos.service'
+import { getPagos } from '../../services/pagos.service'
 
 const QUICK_LINKS = [
   { label: 'Ver Pedidos', path: '/pedidos',  icon: <Package size={26} />, color: 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border-indigo-100' },
@@ -49,9 +22,22 @@ const QUICK_LINKS = [
   { label: 'Caja',        path: '/caja',     icon: <Wallet size={26} />,  color: 'text-amber-600 bg-amber-50 hover:bg-amber-100 border-amber-100' },
 ]
 
+function todayISODate() {
+  const now = new Date()
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+  return local.toISOString().slice(0, 10)
+}
+
+function formatCurrency(value) {
+  return `$${Number(value).toFixed(2)}`
+}
+
 function RecepcionistaPage() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
+
+  const [stats, setStats] = useState({ pedidosHoy: null, listosParaEntregar: null, saldoPendiente: null })
+  const [isLoadingStats, setIsLoadingStats] = useState(true)
 
   const handleLogout = () => {
     logout()
@@ -65,8 +51,61 @@ function RecepcionistaPage() {
     day: 'numeric',
   })
 
+  const loadStats = useCallback(async () => {
+    setIsLoadingStats(true)
+    try {
+      const [hoyResult, listosResult] = await Promise.all([
+        getPedidos({ date: todayISODate(), pageSize: 1 }),
+        getPedidos({ status: 'LISTO', pageSize: 100 }),
+      ])
+
+      const listos = listosResult.data.filter((pedido) => !pedido.cancelledAt)
+      const saldos = await Promise.all(listos.map((pedido) => getPagos(pedido.id)))
+      const saldoPendiente = saldos.reduce((acc, saldo) => acc + Number(saldo.saldoPendiente), 0)
+
+      setStats({
+        pedidosHoy: hoyResult.pagination.total,
+        listosParaEntregar: listos.length,
+        saldoPendiente,
+      })
+    } catch {
+      setStats({ pedidosHoy: '—', listosParaEntregar: '—', saldoPendiente: '—' })
+    } finally {
+      setIsLoadingStats(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadStats()
+  }, [loadStats])
+
+  const STATS = [
+    {
+      label: 'Pedidos de hoy',
+      value: stats.pedidosHoy,
+      icon: <Clock size={32} className="text-blue-500" />,
+      iconBg: 'bg-blue-50',
+      border: 'border-blue-100',
+    },
+    {
+      label: 'Listos para entregar',
+      value: stats.listosParaEntregar,
+      icon: <CheckCircle2 size={32} className="text-green-500" />,
+      iconBg: 'bg-green-50',
+      border: 'border-green-100',
+    },
+    {
+      label: 'Saldo pendiente',
+      value: typeof stats.saldoPendiente === 'number' ? formatCurrency(stats.saldoPendiente) : stats.saldoPendiente,
+      icon: <DollarSign size={32} className="text-amber-500" />,
+      iconBg: 'bg-amber-50',
+      border: 'border-amber-100',
+    },
+  ]
+
   return (
-    <MainLayout navLinks={NAV_LINKS} userName={user?.fullName} userRole={user?.role} onLogout={handleLogout}>
+    <MainLayout navLinks={getNavLinks(user?.role)} userName={user?.fullName} userRole={user?.role} onLogout={handleLogout}>
       {/* flex col + h-full para que las secciones llenen el alto disponible */}
       <div className="flex flex-col h-full gap-5">
 
@@ -113,7 +152,9 @@ function RecepcionistaPage() {
                 {stat.icon}
               </div>
               <div>
-                <p className="text-4xl font-extrabold text-gray-800 mt-3">{stat.value}</p>
+                <p className="text-4xl font-extrabold text-gray-800 mt-3">
+                  {isLoadingStats ? '…' : stat.value}
+                </p>
                 <p className="text-sm text-gray-500 mt-1 leading-tight">{stat.label}</p>
               </div>
             </div>
