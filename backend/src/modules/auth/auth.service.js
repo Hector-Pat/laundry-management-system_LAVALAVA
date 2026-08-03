@@ -1,10 +1,13 @@
 const authRepository = require('./auth.repository');
 const { hashPassword, comparePassword } = require('../../utils/password.util');
 const { generateToken } = require('../../utils/token.util');
-const { USER_ROLES, USER_ROLE_VALUES } = require('../../constants/roles');
+const { USER_ROLES } = require('../../constants/roles');
 
+// El registro publico solo puede crear cuentas CLIENT: cualquier `role` que
+// venga en el payload se ignora. Cuentas de personal (ADMIN/RECEPCIONISTA/
+// OPERADOR) solo las puede crear un ADMIN autenticado via users.service.js.
 function validateRegisterData(data) {
-    const { fullName, email, password, phoneNumber, birthDate, role } = data;
+    const { fullName, email, password, phoneNumber, birthDate } = data;
 
     if (!fullName || !email || !password) {
         const error = new Error('Full name, email and password are required');
@@ -24,25 +27,13 @@ function validateRegisterData(data) {
         throw error;
     }
 
-    if (role && !USER_ROLE_VALUES.includes(role)) {
-        const error = new Error('Invalid user role');
-        error.statusCode = 400;
-        throw error;
-    }
-
-    if (role === USER_ROLES.ADMIN) {
-        const error = new Error('Admin accounts cannot be created through public registration');
-        error.statusCode = 403;
-        throw error;
-    }
-
     return {
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),
         password,
         phoneNumber: phoneNumber || null,
         birthDate: birthDate || null,
-        role: role || USER_ROLES.CLIENT
+        role: USER_ROLES.CLIENT
     };
 }
 

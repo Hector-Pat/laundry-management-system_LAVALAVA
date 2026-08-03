@@ -13,6 +13,19 @@ async function list(req, res, next) {
     }
 }
 
+async function create(req, res, next) {
+    try {
+        const user = await usersService.createUser(req.body);
+
+        return res.status(201).json({
+            message: 'User created successfully',
+            data: user
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function update(req, res, next) {
     try {
         const user = await usersService.updateUser(req.params.id, req.body, req.user);
@@ -41,6 +54,7 @@ async function remove(req, res, next) {
 
 module.exports = {
     list,
+    create,
     update,
     remove
 };

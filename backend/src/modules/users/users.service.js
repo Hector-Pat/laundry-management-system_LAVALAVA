@@ -1,8 +1,71 @@
 const usersRepository = require('./users.repository');
+const { hashPassword } = require('../../utils/password.util');
 const { USER_ROLE_VALUES } = require('../../constants/roles');
 
 async function listUsers() {
     return usersRepository.listUsers();
+}
+
+function validateNewUser(data) {
+    const { fullName, email, password, phoneNumber, birthDate, role } = data;
+
+    if (!fullName || !email || !password || !role) {
+        const error = new Error('Full name, email, password and role are required');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (password.length < 6) {
+        const error = new Error('Password must contain at least 6 characters');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (!USER_ROLE_VALUES.includes(role)) {
+        const error = new Error('Invalid user role');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
+        const error = new Error('Phone number must contain exactly 10 digits');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    return {
+        fullName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        phoneNumber: phoneNumber || null,
+        birthDate: birthDate || null,
+        role
+    };
+}
+
+// A diferencia del registro publico (auth.service.js), esta ruta la usa un
+// ADMIN autenticado y permite crear cualquier rol, incluyendo staff.
+async function createUser(payload) {
+    const validData = validateNewUser(payload);
+
+    const existingUser = await usersRepository.findUserByEmail(validData.email);
+
+    if (existingUser) {
+        const error = new Error('Email is already registered');
+        error.statusCode = 409;
+        throw error;
+    }
+
+    const passwordHash = await hashPassword(validData.password);
+
+    return usersRepository.createUser({
+        fullName: validData.fullName,
+        email: validData.email,
+        passwordHash,
+        phoneNumber: validData.phoneNumber,
+        birthDate: validData.birthDate,
+        role: validData.role
+    });
 }
 
 function parseUserId(id) {
@@ -99,6 +162,7 @@ async function deactivateUser(id, currentUser) {
 
 module.exports = {
     listUsers,
+    createUser,
     updateUser,
     deactivateUser
 };

@@ -1,14 +1,9 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { UserCheck, Shirt, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import api from '../../services/api'
 import './RegisterPage.css'
-
-const ROLES = [
-  { role: 'RECEPCIONISTA', label: 'Recepcionista', Icon: UserCheck, description: 'Atención al cliente' },
-  { role: 'OPERADOR',      label: 'Operador',       Icon: Shirt,      description: 'Estados de prendas' },
-]
 
 function PasswordField({ id, label, placeholder, error, registration }) {
   const [show, setShow] = useState(false)
@@ -45,17 +40,15 @@ function RegisterPage() {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isValid, isSubmitting },
   } = useForm({ mode: 'onChange' })
 
   const password = watch('password')
-  const selectedRole = watch('role')
 
-  const onSubmit = async ({ fullName, email, password, role }) => {
+  const onSubmit = async ({ fullName, email, password }) => {
     setServerError('')
     try {
-      await api.post('/api/auth/register', { fullName, email, password, role })
+      await api.post('/api/auth/register', { fullName, email, password })
       navigate('/login', { state: { registered: true } })
     } catch (err) {
       const msg = err.response?.data?.message || 'Error al crear la cuenta'
@@ -127,26 +120,6 @@ function RegisterPage() {
               validate: (v) => v === password || 'Las contraseñas no coinciden',
             })}
           />
-
-          <div className="form-group">
-            <label>Rol en el sistema</label>
-            <input type="hidden" {...register('role', { required: 'Selecciona un rol' })} />
-            <div className="role-grid">
-              {ROLES.map(({ role, label, Icon, description }) => (
-                <button
-                  key={role}
-                  type="button"
-                  className={`role-card ${selectedRole === role ? 'selected' : ''}`}
-                  onClick={() => setValue('role', role, { shouldValidate: true })}
-                >
-                  <Icon size={28} strokeWidth={1.5} />
-                  <span className="role-card-label">{label}</span>
-                  <span className="role-card-desc">{description}</span>
-                </button>
-              ))}
-            </div>
-            {errors.role && <span className="form-error">{errors.role.message}</span>}
-          </div>
 
           {serverError && <p className="register-server-error">{serverError}</p>}
 

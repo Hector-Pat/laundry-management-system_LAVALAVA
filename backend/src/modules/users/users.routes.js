@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(authenticateToken, authorizeRoles(USER_ROLES.ADMIN));
 
 router.get('/', usersController.list);
+router.post('/', usersController.create);
 router.patch('/:id', usersController.update);
 router.delete('/:id', usersController.remove);
 

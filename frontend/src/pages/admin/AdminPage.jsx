@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, ShieldCheck, ShieldOff, AlertCircle } from 'lucide-react'
+import { Loader2, ShieldCheck, ShieldOff, AlertCircle, Plus, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
-import { getUsers, updateUser } from '../../services/users.service'
+import { getUsers, createUser, updateUser } from '../../services/users.service'
 
 const ROLE_LABELS = {
   ADMIN: 'Administrador',
@@ -14,6 +14,122 @@ const ROLE_LABELS = {
 }
 
 const ROLE_OPTIONS = Object.keys(ROLE_LABELS)
+const STAFF_ROLE_OPTIONS = ROLE_OPTIONS.filter((role) => role !== 'CLIENT')
+
+function CreateUserModal({ onClose, onCreated }) {
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [role, setRole] = useState('RECEPCIONISTA')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const isValid = fullName.trim().length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && password.length >= 6
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isValid) return
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      const created = await createUser({ fullName: fullName.trim(), email: email.trim(), password, role })
+      onCreated(created)
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo crear el usuario')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 text-lg">Crear usuario</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Nombre completo</label>
+            <input
+              type="text"
+              autoFocus
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Correo electrónico</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Contraseña</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            {password.length > 0 && password.length < 6 && (
+              <p className="text-xs text-red-500 mt-1">Mínimo 6 caracteres.</p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Rol</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {STAFF_ROLE_OPTIONS.map((value) => (
+                <option key={value} value={value}>
+                  {ROLE_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+              Crear
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 function AdminPage() {
   const { user, logout } = useAuth()
@@ -23,6 +139,7 @@ function AdminPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [updatingId, setUpdatingId] = useState(null)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -82,9 +199,18 @@ function AdminPage() {
       onLogout={handleLogout}
     >
       <div className="flex flex-col h-full gap-5">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gestión de usuarios</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Administra roles y accesos de todo el personal</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Gestión de usuarios</h1>
+            <p className="text-sm text-gray-400 mt-0.5">Administra roles y accesos de todo el personal</p>
+          </div>
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+          >
+            <Plus size={16} />
+            Crear usuario
+          </button>
         </div>
 
         {error && (
@@ -180,6 +306,16 @@ function AdminPage() {
           )}
         </div>
       </div>
+
+      {isCreateOpen && (
+        <CreateUserModal
+          onClose={() => setIsCreateOpen(false)}
+          onCreated={(created) => {
+            setUsers((prev) => [created, ...prev])
+            setIsCreateOpen(false)
+          }}
+        />
+      )}
     </MainLayout>
   )
 }
