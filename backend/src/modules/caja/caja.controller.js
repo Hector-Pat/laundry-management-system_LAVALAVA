@@ -13,6 +13,19 @@ async function corte(req, res, next) {
     }
 }
 
+async function reporte(req, res, next) {
+    try {
+        const data = await cajaService.getReporte(req.query);
+
+        return res.status(200).json({
+            message: 'Reporte de caja retrieved successfully',
+            data
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function listGastos(req, res, next) {
     try {
         const data = await cajaService.listGastos(req.query);
@@ -41,6 +54,7 @@ async function createGasto(req, res, next) {
 
 module.exports = {
     corte,
+    reporte,
     listGastos,
     createGasto
 };

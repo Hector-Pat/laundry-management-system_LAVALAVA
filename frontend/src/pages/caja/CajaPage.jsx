@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, AlertCircle, Plus, TrendingUp, TrendingDown, Wallet } from 'lucide-react'
+import { Loader2, AlertCircle, Plus, TrendingUp, TrendingDown, Wallet, Download } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
-import { getCorteCaja, createGasto } from '../../services/caja.service'
+import { getCorteCaja, createGasto, getReporteCaja } from '../../services/caja.service'
 import { PAYMENT_METHOD_LABELS, PAYMENT_TYPE_LABELS } from '../../constants/paymentMethods'
 
 function formatCurrency(value) {
@@ -52,6 +52,54 @@ function CajaPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial del corte
     loadCorte()
   }, [loadCorte])
+
+  // Reporte por rango (distinto del corte del dia): tendencia de ingresos y
+  // egresos agrupada por dia, con exportacion a CSV generada en el cliente.
+  const [reporteDesde, setReporteDesde] = useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() - 6)
+    return d.toISOString().slice(0, 10)
+  })
+  const [reporteHasta, setReporteHasta] = useState(todayISODate)
+  const [reporte, setReporte] = useState(null)
+  const [isLoadingReporte, setIsLoadingReporte] = useState(true)
+  const [reporteError, setReporteError] = useState('')
+
+  const loadReporte = useCallback(async () => {
+    setIsLoadingReporte(true)
+    setReporteError('')
+    try {
+      const data = await getReporteCaja(reporteDesde, reporteHasta)
+      setReporte(data)
+    } catch (err) {
+      setReporteError(err.response?.data?.message || 'No se pudo cargar el reporte')
+    } finally {
+      setIsLoadingReporte(false)
+    }
+  }, [reporteDesde, reporteHasta])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial del reporte
+    loadReporte()
+  }, [loadReporte])
+
+  const handleExportCsv = () => {
+    if (!reporte) return
+
+    const rows = [
+      ['Fecha', 'Ingresos', 'Egresos', 'Total'],
+      ...reporte.dias.map((dia) => [dia.date, dia.ingresos, dia.egresos, dia.total]),
+      ['Total', reporte.totales.ingresos, reporte.totales.egresos, reporte.totales.total],
+    ]
+    const csv = rows.map((row) => row.join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `caja_${reporte.from}_a_${reporte.to}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
 
   const [gasto, setGasto] = useState({ concept: '', amount: '' })
   const [isSubmittingGasto, setIsSubmittingGasto] = useState(false)
@@ -228,6 +276,98 @@ function CajaPage() {
             </div>
           </div>
         ) : null}
+
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="font-semibold text-gray-800">Reporte por rango de fechas</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Ingresos y egresos agrupados por día</p>
+            </div>
+            <div className="flex items-end gap-3 flex-wrap">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-500">Desde</label>
+                <input
+                  type="date"
+                  value={reporteDesde}
+                  max={reporteHasta}
+                  onChange={(e) => setReporteDesde(e.target.value)}
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-500">Hasta</label>
+                <input
+                  type="date"
+                  value={reporteHasta}
+                  min={reporteDesde}
+                  max={todayISODate()}
+                  onChange={(e) => setReporteHasta(e.target.value)}
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <button
+                onClick={handleExportCsv}
+                disabled={!reporte || reporte.dias.length === 0}
+                className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
+              >
+                <Download size={16} />
+                Exportar CSV
+              </button>
+            </div>
+          </div>
+
+          {reporteError && (
+            <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">
+              <AlertCircle size={18} />
+              {reporteError}
+            </div>
+          )}
+
+          {isLoadingReporte ? (
+            <div className="flex items-center gap-2 text-gray-400 text-sm py-6 justify-center">
+              <Loader2 size={20} className="animate-spin" /> Cargando reporte...
+            </div>
+          ) : !reporte || reporte.dias.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-6">Sin movimientos en el rango seleccionado</p>
+          ) : (
+            <div className="overflow-x-auto border border-gray-100 rounded-xl">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <tr>
+                    <th className="px-4 py-2 font-semibold">Fecha</th>
+                    <th className="px-4 py-2 font-semibold">Ingresos</th>
+                    <th className="px-4 py-2 font-semibold">Egresos</th>
+                    <th className="px-4 py-2 font-semibold">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {reporte.dias.map((dia) => (
+                    <tr key={dia.date}>
+                      <td className="px-4 py-2 text-gray-700">{dia.date}</td>
+                      <td className="px-4 py-2 text-green-600 font-medium">{formatCurrency(dia.ingresos)}</td>
+                      <td className="px-4 py-2 text-red-600 font-medium">{formatCurrency(dia.egresos)}</td>
+                      <td className="px-4 py-2 font-semibold text-gray-800">{formatCurrency(dia.total)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-gray-50">
+                    <td className="px-4 py-2 font-semibold text-gray-600">Total</td>
+                    <td className="px-4 py-2 font-semibold text-green-600">
+                      {formatCurrency(reporte.totales.ingresos)}
+                    </td>
+                    <td className="px-4 py-2 font-semibold text-red-600">
+                      {formatCurrency(reporte.totales.egresos)}
+                    </td>
+                    <td className="px-4 py-2 font-extrabold text-gray-800">
+                      {formatCurrency(reporte.totales.total)}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </MainLayout>
   )

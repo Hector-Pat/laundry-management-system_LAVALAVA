@@ -7,3 +7,7 @@ export function getCorteCaja(date) {
 export function createGasto(payload) {
   return api.post('/api/caja/gastos', payload).then((res) => res.data.data)
 }
+
+export function getReporteCaja(from, to) {
+  return api.get('/api/caja/reporte', { params: { from, to } }).then((res) => res.data.data)
+}

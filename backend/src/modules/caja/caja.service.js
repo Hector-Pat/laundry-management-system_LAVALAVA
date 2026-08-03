@@ -42,6 +42,67 @@ async function getCorte(query) {
     };
 }
 
+// Reporte por rango de fechas (distinto del corte diario): agrupa ingresos
+// y egresos por dia para poder ver una tendencia, no solo el corte de hoy.
+async function getReporte(query) {
+    const from = parseDateFilter(query.from);
+    const to = parseDateFilter(query.to);
+
+    if (!from || !to) {
+        const error = new Error('from and to are required (YYYY-MM-DD)');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (from > to) {
+        const error = new Error('from must be before or equal to to');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const [ingresosPorDia, egresosPorDia] = await Promise.all([
+        cajaRepository.sumPagosByDateRange(from, to),
+        cajaRepository.sumGastosByDateRange(from, to)
+    ]);
+
+    const byDate = new Map();
+
+    const ensureDate = (date) => {
+        if (!byDate.has(date)) {
+            byDate.set(date, { date, ingresos: 0, egresos: 0 });
+        }
+
+        return byDate.get(date);
+    };
+
+    ingresosPorDia.forEach((row) => {
+        ensureDate(row.date).ingresos = round2(Number(row.total));
+    });
+
+    egresosPorDia.forEach((row) => {
+        ensureDate(row.date).egresos = round2(Number(row.total));
+    });
+
+    const dias = Array.from(byDate.values())
+        .map((dia) => ({ ...dia, total: round2(dia.ingresos - dia.egresos) }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    const totales = dias.reduce(
+        (acc, dia) => ({
+            ingresos: round2(acc.ingresos + dia.ingresos),
+            egresos: round2(acc.egresos + dia.egresos)
+        }),
+        { ingresos: 0, egresos: 0 }
+    );
+
+    return {
+        from,
+        to,
+        dias,
+        totales: { ...totales, total: round2(totales.ingresos - totales.egresos) }
+    };
+}
+
 async function listGastos(query) {
     const date = parseDateFilter(query.date);
 
@@ -73,6 +134,7 @@ async function registerGasto(payload, currentUser) {
 
 module.exports = {
     getCorte,
+    getReporte,
     listGastos,
     registerGasto
 };
