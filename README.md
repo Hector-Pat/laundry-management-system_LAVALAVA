@@ -158,15 +158,18 @@ Por defecto Vite expone la app en `http://localhost:5173`.
 
 1. Abre `http://localhost:5173` en el navegador.
 2. Inicia sesión con el usuario ADMIN creado en el paso 2.2, o regístrate como cliente desde `/register`.
-3. Según el rol del usuario autenticado, el sistema redirige a las vistas correspondientes (`/admin`, `/operador`, `/recepcionista`, `/dashboard`).
+3. Según el rol del usuario autenticado, el sistema redirige a las vistas correspondientes (`/admin`, `/operador`, `/recepcionista`, `/dashboard`, o `/mis-pedidos` para clientes).
 
 ## Scripts disponibles
 
 **Backend** (`backend/package.json`)
 
-| Comando       | Descripción                                  |
-|---------------|-----------------------------------------------|
-| `npm run dev` | Inicia el servidor con nodemon (auto-reload) |
+| Comando        | Descripción                                   |
+|----------------|-------------------------------------------------|
+| `npm run dev`  | Inicia el servidor con nodemon (auto-reload)   |
+| `npm start`    | Inicia el servidor en modo produccion (sin nodemon) |
+| `npm test`     | Corre la suite de tests con Jest               |
+| `npm run lint` | Corre ESLint sobre el código                    |
 
 **Frontend** (`frontend/package.json`)
 
@@ -176,3 +179,24 @@ Por defecto Vite expone la app en `http://localhost:5173`.
 | `npm run build`   | Genera el build de producción         |
 | `npm run preview` | Sirve el build de producción localmente |
 | `npm run lint`    | Corre ESLint sobre el código           |
+
+## Docker
+
+También puedes levantar todo el stack (MySQL + backend + frontend) con Docker Compose, sin instalar Node ni MySQL localmente:
+
+```bash
+docker compose up --build
+```
+
+Esto expone el frontend en `http://localhost:5173`, el backend en `http://localhost:3000`, y crea la base de datos con el esquema de `backend/database/schema.sql` la primera vez que se levanta (el volumen `mysql_data` persiste los datos entre reinicios).
+
+Por defecto usa `DB_PASSWORD=root` y un `JWT_SECRET` de ejemplo. Para cambiarlos, crea un archivo `.env` junto a `docker-compose.yml` (Docker Compose lo lee automáticamente):
+
+```env
+DB_PASSWORD=una_clave_segura
+JWT_SECRET=otra_clave_segura
+```
+
+## CI
+
+`.github/workflows/ci.yml` corre en cada push/PR a `main`: instala dependencias, corre ESLint y los tests del backend, y ESLint + build del frontend.
