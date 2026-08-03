@@ -191,7 +191,7 @@ async function findPedidoById(id) {
     };
 }
 
-async function listPedidos({ status, date, clienteId, clienteIds, cliente, page, pageSize }) {
+async function listPedidos({ status, date, deliveredDate, clienteId, clienteIds, cliente, page, pageSize }) {
     const conditions = [];
     const values = [];
 
@@ -203,6 +203,11 @@ async function listPedidos({ status, date, clienteId, clienteIds, cliente, page,
     if (date) {
         conditions.push('DATE(p.created_at) = ?');
         values.push(date);
+    }
+
+    if (deliveredDate) {
+        conditions.push('DATE(p.delivered_at) = ?');
+        values.push(deliveredDate);
     }
 
     if (clienteId) {

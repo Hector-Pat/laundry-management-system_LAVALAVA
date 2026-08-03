@@ -147,7 +147,7 @@ function parsePagination(query) {
 }
 
 async function listPedidos(query) {
-    const { status, date, clienteId, cliente } = query;
+    const { status, date, deliveredDate, clienteId, cliente } = query;
 
     if (status && !ORDER_STATUS_VALUES.includes(status)) {
         const error = new Error('Invalid status filter');
@@ -160,6 +160,7 @@ async function listPedidos(query) {
     return pedidosRepository.listPedidos({
         status: status || null,
         date: date || null,
+        deliveredDate: deliveredDate || null,
         clienteId: clienteId ? parseId(clienteId, 'clienteId') : null,
         cliente: cliente || null,
         page,

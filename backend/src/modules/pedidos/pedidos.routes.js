@@ -55,6 +55,10 @@ router.use(authenticateToken);
  *         in: query
  *         description: Filtra por fecha de creacion (YYYY-MM-DD)
  *         schema: { type: string, format: date }
+ *       - name: deliveredDate
+ *         in: query
+ *         description: Filtra por fecha de entrega (YYYY-MM-DD)
+ *         schema: { type: string, format: date }
  *       - name: clienteId
  *         in: query
  *         description: Filtra por id de cliente
