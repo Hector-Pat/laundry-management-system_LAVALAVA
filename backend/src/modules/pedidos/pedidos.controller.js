@@ -53,6 +53,19 @@ async function updateStatus(req, res, next) {
     }
 }
 
+async function updateItems(req, res, next) {
+    try {
+        const pedido = await pedidosService.updatePedidoItemsService(req.params.id, req.body);
+
+        return res.status(200).json({
+            message: 'Pedido items updated successfully',
+            data: pedido
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function cancel(req, res, next) {
     try {
         const pedido = await pedidosService.cancelPedido(req.params.id, req.body.reason, req.user);
@@ -71,5 +84,6 @@ module.exports = {
     list,
     getById,
     updateStatus,
+    updateItems,
     cancel
 };

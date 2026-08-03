@@ -62,6 +62,11 @@ function AppRouter() {
             <PedidoFormPage />
           </ProtectedRoute>
         } />
+        <Route path="/pedidos/:id/editar" element={
+          <ProtectedRoute roles={PEDIDOS_CREATE_ROLES}>
+            <PedidoFormPage />
+          </ProtectedRoute>
+        } />
         <Route path="/pedidos/:id" element={
           <ProtectedRoute roles={PEDIDOS_STAFF_ROLES}>
             <PedidoDetailPage />

@@ -89,6 +89,40 @@ async function createPedidoWithItems({ clienteInput, items, total, createdBy }) 
     }
 }
 
+// Reemplaza el detalle completo de un pedido (borra e reinserta) y
+// recalcula el total, en una sola transaccion. Solo se llama para pedidos
+// en RECIBIDO sin pagos (ver pedidos.service.js::updatePedidoItemsService),
+// asi que no hay folio ni cliente que tocar, a diferencia de createPedidoWithItems.
+async function updatePedidoItems(pedidoId, items, total) {
+    const connection = await pool.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        await connection.query('DELETE FROM detalle_pedido WHERE pedido_id = ?', [pedidoId]);
+
+        for (const item of items) {
+            await connection.query(
+                `INSERT INTO detalle_pedido
+                    (pedido_id, servicio_id, servicio_name, quantity, unit_price, subtotal)
+                VALUES (?, ?, ?, ?, ?, ?)`,
+                [pedidoId, item.servicioId, item.servicioName, item.quantity, item.unitPrice, item.subtotal]
+            );
+        }
+
+        await connection.query('UPDATE pedidos SET total = ? WHERE id = ?', [total, pedidoId]);
+
+        await connection.commit();
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+
+    return findPedidoById(pedidoId);
+}
+
 async function findPedidoById(id) {
     const [pedidoRows] = await pool.query(
         `SELECT
@@ -272,5 +306,6 @@ module.exports = {
     lockPedidoById,
     listPedidos,
     updateStatus,
+    updatePedidoItems,
     cancelPedido
 };

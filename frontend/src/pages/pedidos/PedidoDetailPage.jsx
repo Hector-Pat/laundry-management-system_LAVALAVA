@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Printer, Receipt, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert } from 'lucide-react'
+import { ArrowLeft, Printer, Receipt, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert, Pencil } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
@@ -143,6 +143,13 @@ function PedidoDetailPage() {
   const canCancel =
     pedido && !pedido.cancelledAt && pedido.status !== 'ENTREGADO' && CANCEL_ROLES.includes(user?.role)
 
+  const canEdit =
+    pedido &&
+    !pedido.cancelledAt &&
+    pedido.status === 'RECIBIDO' &&
+    CANCEL_ROLES.includes(user?.role) &&
+    (!paymentSummary || paymentSummary.totalPagado === 0)
+
   const [showCancelModal, setShowCancelModal] = useState(false)
 
   const handleAdvance = async () => {
@@ -175,6 +182,15 @@ function PedidoDetailPage() {
 
           {pedido && (
             <div className="flex items-center gap-2">
+              {canEdit && (
+                <Link
+                  to={`/pedidos/${id}/editar`}
+                  className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+                >
+                  <Pencil size={16} />
+                  Editar
+                </Link>
+              )}
               <button
                 onClick={() => handlePrint('etiqueta')}
                 className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"

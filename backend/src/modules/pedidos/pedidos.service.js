@@ -2,6 +2,7 @@ const QRCode = require('qrcode');
 const pedidosRepository = require('./pedidos.repository');
 const clientesService = require('../clientes/clientes.service');
 const serviciosRepository = require('../servicios/servicios.repository');
+const pagosRepository = require('../pagos/pagos.repository');
 const { ORDER_STATUSES, ORDER_STATUS_VALUES, ORDER_TRANSITIONS } = require('../../constants/orderStatus');
 const { USER_ROLES } = require('../../constants/roles');
 const { notifyPedidoListo } = require('../../utils/whatsappNotifier');
@@ -229,6 +230,48 @@ async function updateStatus(id, newStatus, currentUser) {
     return { ...updated, qrCode };
 }
 
+// Solo se puede editar el detalle de un pedido antes de que entre a proceso
+// (RECIBIDO) y mientras no tenga pagos registrados, para no descuadrar un
+// saldo ya cobrado sobre un total distinto.
+async function updatePedidoItemsService(id, payload) {
+    const pedidoId = parseId(id);
+    const pedido = await pedidosRepository.findPedidoById(pedidoId);
+
+    if (!pedido) {
+        const error = new Error('Pedido not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    if (pedido.cancelledAt) {
+        const error = new Error('This pedido has been cancelled');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (pedido.status !== ORDER_STATUSES.RECIBIDO) {
+        const error = new Error('Only pedidos in RECIBIDO status can be edited');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const totalPagado = await pagosRepository.sumByPedidoId(pedidoId);
+
+    if (totalPagado > 0) {
+        const error = new Error('Cannot edit a pedido that already has payments registered');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const items = await buildItems(payload.items);
+    const total = Number(items.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2));
+
+    const updated = await pedidosRepository.updatePedidoItems(pedidoId, items, total);
+    const qrCode = await buildQrCode(updated.folio);
+
+    return { ...updated, qrCode };
+}
+
 // Cancelar no es una transicion mas de la maquina de estados (ver
 // orderStatus.js): puede pasar desde cualquier estado no terminal, no solo
 // desde el "anterior" en la cadena RECIBIDO->...->ENTREGADO. No reembolsa
@@ -274,6 +317,7 @@ module.exports = {
     getPedidoById,
     listPedidos,
     updateStatus,
+    updatePedidoItemsService,
     cancelPedido,
     parseId
 };

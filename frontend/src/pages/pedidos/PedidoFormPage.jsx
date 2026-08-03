@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Search, X, UserPlus, Loader2, AlertCircle, Minus, Plus } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { searchClientes } from '../../services/clientes.service'
 import { getServicios } from '../../services/servicios.service'
-import { createPedido } from '../../services/pedidos.service'
+import { createPedido, getPedidoById, updatePedidoItems } from '../../services/pedidos.service'
 
 function formatCurrency(value) {
   return `$${Number(value).toFixed(2)}`
@@ -15,11 +15,45 @@ function formatCurrency(value) {
 function PedidoFormPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const { id } = useParams()
+  const isEditMode = Boolean(id)
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
+
+  // Modo edicion: solo se reemplazan los items de un pedido existente (en
+  // RECIBIDO, sin pagos); el cliente ya quedo fijo al crear el pedido.
+  const [editablePedido, setEditablePedido] = useState(null)
+  const [isLoadingPedido, setIsLoadingPedido] = useState(isEditMode)
+  const [loadError, setLoadError] = useState('')
+
+  useEffect(() => {
+    if (!isEditMode) return undefined
+
+    let cancelled = false
+
+    getPedidoById(id)
+      .then((data) => {
+        if (cancelled) return
+        setEditablePedido(data)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setLoadError(err.response?.data?.message || 'No se pudo cargar el pedido')
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingPedido(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [id, isEditMode])
+
+  const isEditable =
+    !isEditMode || (editablePedido && !editablePedido.cancelledAt && editablePedido.status === 'RECIBIDO')
 
   // Cliente: buscar uno existente, o darlo de alta con solo nombre + telefono.
   const [clienteMode, setClienteMode] = useState('search')
@@ -73,6 +107,16 @@ function PedidoFormPage() {
     loadServicios()
   }, [loadServicios])
 
+  useEffect(() => {
+    if (!editablePedido) return
+    const initial = {}
+    editablePedido.items.forEach((item) => {
+      initial[item.servicioId] = item.quantity
+    })
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- precarga de items al entrar en modo edicion
+    setQuantities(initial)
+  }, [editablePedido])
+
   const toggleServicio = (servicioId) => {
     setQuantities((prev) => {
       const next = { ...prev }
@@ -105,7 +149,7 @@ function PedidoFormPage() {
 
   const isNewClienteValid = newCliente.fullName.trim() && /^\d{10}$/.test(newCliente.phoneNumber)
   const hasValidCliente = clienteMode === 'search' ? Boolean(selectedCliente) : isNewClienteValid
-  const canSubmit = hasValidCliente && selectedItems.length > 0
+  const canSubmit = (isEditMode || hasValidCliente) && selectedItems.length > 0 && isEditable
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -117,6 +161,14 @@ function PedidoFormPage() {
     setIsSubmitting(true)
     setError('')
     try {
+      const items = selectedItems.map((item) => ({ servicioId: item.servicio.id, quantity: item.quantity }))
+
+      if (isEditMode) {
+        await updatePedidoItems(id, items)
+        navigate(`/pedidos/${id}`)
+        return
+      }
+
       const cliente =
         clienteMode === 'search'
           ? { id: selectedCliente.id }
@@ -126,16 +178,47 @@ function PedidoFormPage() {
               email: newCliente.email.trim() || undefined,
             }
 
-      const pedido = await createPedido({
-        cliente,
-        items: selectedItems.map((item) => ({ servicioId: item.servicio.id, quantity: item.quantity })),
-      })
+      const pedido = await createPedido({ cliente, items })
 
       navigate(`/pedidos/${pedido.id}`)
     } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo crear el pedido')
+      setError(err.response?.data?.message || (isEditMode ? 'No se pudo editar el pedido' : 'No se pudo crear el pedido'))
       setIsSubmitting(false)
     }
+  }
+
+  if (isEditMode && isLoadingPedido) {
+    return (
+      <MainLayout
+        navLinks={getNavLinks(user?.role)}
+        userName={user?.fullName}
+        userRole={user?.role}
+        onLogout={handleLogout}
+      >
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
+          <Loader2 size={32} className="animate-spin" />
+          <p className="text-sm font-medium">Cargando pedido...</p>
+        </div>
+      </MainLayout>
+    )
+  }
+
+  if (isEditMode && (loadError || !isEditable)) {
+    return (
+      <MainLayout
+        navLinks={getNavLinks(user?.role)}
+        userName={user?.fullName}
+        userRole={user?.role}
+        onLogout={handleLogout}
+      >
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400 text-center">
+          <AlertCircle size={32} />
+          <p className="text-sm font-medium">
+            {loadError || 'Este pedido ya no se puede editar (debe estar en RECIBIDO y sin pagos registrados).'}
+          </p>
+        </div>
+      </MainLayout>
+    )
   }
 
   return (
@@ -147,8 +230,14 @@ function PedidoFormPage() {
     >
       <form onSubmit={handleSubmit} className="flex flex-col h-full gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Nuevo pedido</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Selecciona un cliente y los servicios a registrar</p>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {isEditMode ? `Editar pedido ${editablePedido?.folio ?? ''}` : 'Nuevo pedido'}
+          </h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            {isEditMode
+              ? 'Ajusta los servicios de este pedido antes de que entre a proceso'
+              : 'Selecciona un cliente y los servicios a registrar'}
+          </p>
         </div>
 
         {error && (
@@ -160,6 +249,18 @@ function PedidoFormPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 flex-1 min-h-0">
           {/* Cliente */}
+          {isEditMode ? (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+              <h2 className="font-semibold text-gray-800">Cliente</h2>
+              <div className="bg-gray-50 rounded-xl px-4 py-3">
+                <p className="font-semibold text-gray-800">{editablePedido?.cliente.fullName}</p>
+                <p className="text-xs text-gray-500">{editablePedido?.cliente.phoneNumber}</p>
+              </div>
+              <p className="text-xs text-gray-400">
+                El cliente de un pedido no se puede cambiar una vez creado.
+              </p>
+            </div>
+          ) : (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-gray-800">Cliente</h2>
@@ -269,6 +370,7 @@ function PedidoFormPage() {
               </div>
             )}
           </div>
+          )}
 
           {/* Servicios */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3 min-h-0">
@@ -343,7 +445,13 @@ function PedidoFormPage() {
             className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-xl transition-colors"
           >
             {isSubmitting && <Loader2 size={18} className="animate-spin" />}
-            {isSubmitting ? 'Creando pedido...' : 'Crear pedido'}
+            {isEditMode
+              ? isSubmitting
+                ? 'Guardando cambios...'
+                : 'Guardar cambios'
+              : isSubmitting
+                ? 'Creando pedido...'
+                : 'Crear pedido'}
           </button>
         </div>
       </form>

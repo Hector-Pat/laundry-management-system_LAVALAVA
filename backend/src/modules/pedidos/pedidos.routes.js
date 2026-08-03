@@ -37,6 +37,14 @@ router.patch(
     pedidosController.updateStatus
 );
 
+// Editar detalle: solo pedidos en RECIBIDO sin pagos, ver comentario en
+// pedidos.service.js::updatePedidoItemsService.
+router.put(
+    '/:id/items',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN),
+    pedidosController.updateItems
+);
+
 // Cancelar pedido: no reembolsa pagos automaticamente, ver comentario en
 // pedidos.service.js::cancelPedido.
 router.patch(

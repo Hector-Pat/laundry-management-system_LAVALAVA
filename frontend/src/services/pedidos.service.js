@@ -19,3 +19,7 @@ export function updatePedidoStatus(id, status) {
 export function cancelPedido(id, reason) {
   return api.patch(`/api/pedidos/${id}/cancelar`, { reason }).then((res) => res.data.data)
 }
+
+export function updatePedidoItems(id, items) {
+  return api.put(`/api/pedidos/${id}/items`, { items }).then((res) => res.data.data)
+}
