@@ -28,8 +28,8 @@ function LoginPage() {
     setServerError('')
     try {
       const { data } = await api.post('/api/auth/login', { email, password })
-      const { token, user } = data.data
-      login(user, token)
+      const { user } = data.data
+      login(user)
       navigate(ROLE_ROUTES[user.role] ?? '/dashboard')
     } catch (err) {
       const msg = err.response?.data?.message || 'Error al iniciar sesión'

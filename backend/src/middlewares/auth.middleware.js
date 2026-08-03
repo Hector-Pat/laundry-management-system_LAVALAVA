@@ -1,19 +1,11 @@
 const { verifyToken } = require('../utils/token.util');
 
 function authenticateToken(req, res, next) {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.token;
 
-    if (!authHeader) {
+    if (!token) {
         return res.status(401).json({
-            message: 'Authorization header is required'
-        });
-    }
-
-    const [scheme, token] = authHeader.split(' ');
-
-    if (scheme !== 'Bearer' || !token) {
-        return res.status(401).json({
-            message: 'Invalid authorization format'
+            message: 'Authentication cookie is required'
         });
     }
 
