@@ -83,6 +83,7 @@ El backend usa un archivo `.env` en `backend/.env` con las siguientes variables:
 | `DB_NAME`        | Nombre de la base de datos                      | `lavalavabd`                |
 | `JWT_SECRET`     | Clave para firmar los tokens JWT                | una cadena aleatoria larga |
 | `JWT_EXPIRES_IN` | Tiempo de expiración del token                  | `2h`                        |
+| `FRONTEND_URL`   | Origen permitido por CORS (URL del frontend)    | `http://localhost:5173`     |
 
 Ejemplo de `backend/.env`:
 
@@ -95,6 +96,8 @@ DB_NAME=lavalavabd
 
 JWT_SECRET=cambia_esta_clave_por_una_segura
 JWT_EXPIRES_IN=2h
+
+FRONTEND_URL=http://localhost:5173
 ```
 
 > **Importante:** `JWT_SECRET` debe ser una clave única y secreta, distinta en cada entorno (desarrollo/producción), y nunca debe subirse al control de versiones.
