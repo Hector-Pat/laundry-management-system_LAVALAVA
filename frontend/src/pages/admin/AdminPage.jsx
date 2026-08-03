@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, ShieldCheck, ShieldOff, AlertCircle, Plus, X } from 'lucide-react'
+import { Loader2, ShieldCheck, ShieldOff, AlertCircle, Plus, X, KeyRound } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
@@ -131,6 +131,83 @@ function CreateUserModal({ onClose, onCreated }) {
   )
 }
 
+function ResetPasswordModal({ targetUser, onClose, onSubmit }) {
+  const [password, setPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const isValid = password.length >= 6
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isValid) return
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await onSubmit(password)
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo restablecer la contraseña')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 text-lg">Restablecer contraseña</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-500">
+          Nueva contraseña para <span className="font-semibold text-gray-800">{targetUser.fullName}</span>
+        </p>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-500">Nueva contraseña (mínimo 6 caracteres)</label>
+            <input
+              type="password"
+              autoFocus
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+              Restablecer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 function AdminPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -140,6 +217,7 @@ function AdminPage() {
   const [error, setError] = useState('')
   const [updatingId, setUpdatingId] = useState(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [resettingUser, setResettingUser] = useState(null)
 
   const handleLogout = () => {
     logout()
@@ -278,24 +356,34 @@ function AdminPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button
-                            onClick={() => handleToggleActive(rowUser)}
-                            disabled={isSelf || isRowUpdating}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                              rowUser.isActive
-                                ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                : 'bg-green-50 text-green-600 hover:bg-green-100'
-                            }`}
-                          >
-                            {isRowUpdating ? (
-                              <Loader2 size={14} className="animate-spin" />
-                            ) : rowUser.isActive ? (
-                              <ShieldOff size={14} />
-                            ) : (
-                              <ShieldCheck size={14} />
-                            )}
-                            {rowUser.isActive ? 'Desactivar' : 'Activar'}
-                          </button>
+                          <div className="inline-flex items-center gap-2">
+                            <button
+                              onClick={() => setResettingUser(rowUser)}
+                              disabled={isRowUpdating}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <KeyRound size={14} />
+                              Contraseña
+                            </button>
+                            <button
+                              onClick={() => handleToggleActive(rowUser)}
+                              disabled={isSelf || isRowUpdating}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                rowUser.isActive
+                                  ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                  : 'bg-green-50 text-green-600 hover:bg-green-100'
+                              }`}
+                            >
+                              {isRowUpdating ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : rowUser.isActive ? (
+                                <ShieldOff size={14} />
+                              ) : (
+                                <ShieldCheck size={14} />
+                              )}
+                              {rowUser.isActive ? 'Desactivar' : 'Activar'}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )
@@ -313,6 +401,18 @@ function AdminPage() {
           onCreated={(created) => {
             setUsers((prev) => [created, ...prev])
             setIsCreateOpen(false)
+          }}
+        />
+      )}
+
+      {resettingUser && (
+        <ResetPasswordModal
+          targetUser={resettingUser}
+          onClose={() => setResettingUser(null)}
+          onSubmit={async (password) => {
+            const updated = await updateUser(resettingUser.id, { password })
+            setUsers((prev) => prev.map((item) => (item.id === updated.id ? updated : item)))
+            setResettingUser(null)
           }}
         />
       )}

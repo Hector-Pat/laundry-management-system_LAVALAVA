@@ -92,6 +92,11 @@ async function updateUser(id, updates) {
         values.push(updates.isActive);
     }
 
+    if (updates.passwordHash !== undefined) {
+        fields.push('password_hash = ?');
+        values.push(updates.passwordHash);
+    }
+
     if (fields.length === 0) {
         return findUserById(id);
     }

@@ -81,7 +81,7 @@ function parseUserId(id) {
 }
 
 function validateUpdates(updates) {
-    const { role, isActive } = updates;
+    const { role, isActive, password } = updates;
     const changes = {};
 
     if (role !== undefined) {
@@ -102,6 +102,15 @@ function validateUpdates(updates) {
         changes.isActive = isActive;
     }
 
+    if (password !== undefined) {
+        if (typeof password !== 'string' || password.length < 6) {
+            const error = new Error('Password must contain at least 6 characters');
+            error.statusCode = 400;
+            throw error;
+        }
+        changes.password = password;
+    }
+
     if (Object.keys(changes).length === 0) {
         const error = new Error('No valid fields to update');
         error.statusCode = 400;
@@ -111,9 +120,17 @@ function validateUpdates(updates) {
     return changes;
 }
 
+// ADMIN puede resetear la contrasena de cualquier usuario (updates.password)
+// sin necesitar infraestructura de "olvide mi contrasena" por correo, que
+// este proyecto no tiene.
 async function updateUser(id, updates, currentUser) {
     const userId = parseUserId(id);
     const changes = validateUpdates(updates);
+
+    if (changes.password) {
+        changes.passwordHash = await hashPassword(changes.password);
+        delete changes.password;
+    }
 
     if (userId === currentUser.id) {
         if (changes.role && changes.role !== currentUser.role) {

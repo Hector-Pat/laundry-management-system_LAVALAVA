@@ -108,7 +108,43 @@ async function loginUser(data) {
     };
 }
 
+async function changePassword(currentUser, payload) {
+    const { currentPassword, newPassword } = payload;
+
+    if (!currentPassword || !newPassword) {
+        const error = new Error('currentPassword and newPassword are required');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (newPassword.length < 6) {
+        const error = new Error('newPassword must contain at least 6 characters');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const user = await authRepository.findUserByEmail(currentUser.email);
+
+    if (!user) {
+        const error = new Error('User not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const isCurrentPasswordValid = await comparePassword(currentPassword, user.passwordHash);
+
+    if (!isCurrentPasswordValid) {
+        const error = new Error('Current password is incorrect');
+        error.statusCode = 401;
+        throw error;
+    }
+
+    const passwordHash = await hashPassword(newPassword);
+    await authRepository.updateUser(user.id, { passwordHash });
+}
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    changePassword
 };

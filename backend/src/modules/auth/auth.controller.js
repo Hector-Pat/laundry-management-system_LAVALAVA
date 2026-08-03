@@ -26,7 +26,20 @@ async function login(req, res, next) {
     }
 }
 
+async function changePassword(req, res, next) {
+    try {
+        await authService.changePassword(req.user, req.body);
+
+        return res.status(200).json({
+            message: 'Password updated successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     register,
-    login
+    login,
+    changePassword
 };
