@@ -128,10 +128,42 @@ async function update(id, changes, executor = pool) {
     return findById(id, executor);
 }
 
+// Enlaza una cuenta de usuario (rol CLIENT) con su(s) registro(s) de cliente
+// de mostrador por coincidencia exacta de email o telefono, ya que ambas
+// tablas son independientes (no hay FK entre users y clientes). Si el
+// cliente se registro con datos distintos a los que dio en mostrador, no
+// hay match: limitacion conocida, ver pedidos.service.js::getMisPedidos.
+async function findIdsByContact({ email, phoneNumber }, executor = pool) {
+    const conditions = [];
+    const values = [];
+
+    if (email) {
+        conditions.push('email = ?');
+        values.push(email);
+    }
+
+    if (phoneNumber) {
+        conditions.push('phone_number = ?');
+        values.push(phoneNumber);
+    }
+
+    if (conditions.length === 0) {
+        return [];
+    }
+
+    const [rows] = await executor.query(
+        `SELECT id FROM clientes WHERE ${conditions.join(' OR ')}`,
+        values
+    );
+
+    return rows.map((row) => row.id);
+}
+
 module.exports = {
     create,
     findById,
     search,
     listPaginated,
-    update
+    update,
+    findIdsByContact
 };

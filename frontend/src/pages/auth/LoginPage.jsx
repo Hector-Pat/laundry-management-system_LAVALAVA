@@ -9,7 +9,7 @@ const ROLE_ROUTES = {
   ADMIN: '/admin',
   RECEPCIONISTA: '/recepcionista',
   OPERADOR: '/operador',
-  CLIENT: '/dashboard',
+  CLIENT: '/mis-pedidos',
 }
 
 function LoginPage() {

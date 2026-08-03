@@ -1,8 +1,10 @@
 const QRCode = require('qrcode');
 const pedidosRepository = require('./pedidos.repository');
 const clientesService = require('../clientes/clientes.service');
+const clientesRepository = require('../clientes/clientes.repository');
 const serviciosRepository = require('../servicios/servicios.repository');
 const pagosRepository = require('../pagos/pagos.repository');
+const authRepository = require('../auth/auth.repository');
 const { ORDER_STATUSES, ORDER_STATUS_VALUES, ORDER_TRANSITIONS } = require('../../constants/orderStatus');
 const { USER_ROLES } = require('../../constants/roles');
 const { notifyPedidoListo } = require('../../utils/whatsappNotifier');
@@ -164,6 +166,30 @@ async function listPedidos(query) {
     });
 }
 
+// Portal de cliente: no hay FK entre users (cuentas con rol CLIENT) y
+// clientes (directorio de mostrador), asi que se enlazan por coincidencia
+// exacta de email o telefono. Si el cliente se registro con datos distintos
+// a los que dio en mostrador, esta lista sale vacia (limitacion conocida).
+async function getMisPedidos(currentUser, query) {
+    const account = await authRepository.findUserById(currentUser.id);
+    const clienteIds = await clientesRepository.findIdsByContact({
+        email: account?.email || null,
+        phoneNumber: account?.phoneNumber || null
+    });
+
+    const { page, pageSize } = parsePagination(query);
+
+    return pedidosRepository.listPedidos({
+        status: null,
+        date: null,
+        clienteId: null,
+        clienteIds,
+        cliente: null,
+        page,
+        pageSize
+    });
+}
+
 // Maquina de estados lineal (ver constants/orderStatus.js): cada rol solo
 // puede avanzar un pedido a su siguiente estado. ADMIN puede forzar
 // cualquier estado valido, para poder corregir un pedido mal capturado.
@@ -319,5 +345,6 @@ module.exports = {
     updateStatus,
     updatePedidoItemsService,
     cancelPedido,
+    getMisPedidos,
     parseId
 };

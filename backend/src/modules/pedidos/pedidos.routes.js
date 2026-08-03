@@ -22,6 +22,14 @@ router.get(
     pedidosController.list
 );
 
+// Portal de cliente (debe ir antes de GET /:id para que "mias" no se
+// interprete como un id de pedido).
+router.get(
+    '/mias',
+    authorizeRoles(USER_ROLES.CLIENT),
+    pedidosController.listMine
+);
+
 router.get(
     '/:id',
     authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.OPERADOR, USER_ROLES.ADMIN),

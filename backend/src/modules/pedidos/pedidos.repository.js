@@ -189,7 +189,7 @@ async function findPedidoById(id) {
     };
 }
 
-async function listPedidos({ status, date, clienteId, cliente, page, pageSize }) {
+async function listPedidos({ status, date, clienteId, clienteIds, cliente, page, pageSize }) {
     const conditions = [];
     const values = [];
 
@@ -206,6 +206,15 @@ async function listPedidos({ status, date, clienteId, cliente, page, pageSize })
     if (clienteId) {
         conditions.push('p.cliente_id = ?');
         values.push(clienteId);
+    } else if (clienteIds) {
+        // Usado por el portal de cliente (getMisPedidos): puede haber mas de
+        // un registro de cliente enlazado a la misma cuenta.
+        if (clienteIds.length === 0) {
+            conditions.push('1 = 0');
+        } else {
+            conditions.push(`p.cliente_id IN (${clienteIds.map(() => '?').join(',')})`);
+            values.push(...clienteIds);
+        }
     } else if (cliente) {
         conditions.push('(c.full_name LIKE ? OR c.phone_number LIKE ?)');
         values.push(`%${cliente}%`, `%${cliente}%`);

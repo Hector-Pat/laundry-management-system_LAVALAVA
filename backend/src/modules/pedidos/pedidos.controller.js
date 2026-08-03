@@ -27,6 +27,20 @@ async function list(req, res, next) {
     }
 }
 
+async function listMine(req, res, next) {
+    try {
+        const result = await pedidosService.getMisPedidos(req.user, req.query);
+
+        return res.status(200).json({
+            message: 'Pedidos retrieved successfully',
+            data: result.data,
+            pagination: result.pagination
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function getById(req, res, next) {
     try {
         const pedido = await pedidosService.getPedidoById(req.params.id);
@@ -82,6 +96,7 @@ async function cancel(req, res, next) {
 module.exports = {
     create,
     list,
+    listMine,
     getById,
     updateStatus,
     updateItems,
