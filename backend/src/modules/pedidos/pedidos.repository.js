@@ -224,6 +224,18 @@ async function listPedidos({ status, date, clienteId, cliente, page, pageSize })
     };
 }
 
+// Bloquea la fila del pedido dentro de una transaccion (SELECT ... FOR
+// UPDATE) para que dos operaciones concurrentes sobre el mismo pedido
+// (p.ej. dos pagos a la vez) no puedan leer el mismo saldo y pisarse.
+async function lockPedidoById(id, connection) {
+    const [rows] = await connection.query(
+        `SELECT id, total, status FROM pedidos WHERE id = ? FOR UPDATE`,
+        [id]
+    );
+
+    return rows[0] || null;
+}
+
 async function updateStatus(id, status) {
     const deliveredAtAssignment = status === 'ENTREGADO' ? ', delivered_at = NOW()' : '';
 
@@ -238,6 +250,7 @@ async function updateStatus(id, status) {
 module.exports = {
     createPedidoWithItems,
     findPedidoById,
+    lockPedidoById,
     listPedidos,
     updateStatus
 };

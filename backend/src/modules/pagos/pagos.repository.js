@@ -30,14 +30,14 @@ async function listByPedidoId(pedidoId) {
     return rows;
 }
 
-async function create({ pedidoId, amount, method, type, registeredBy }) {
-    const [result] = await pool.query(
+async function create({ pedidoId, amount, method, type, registeredBy }, executor = pool) {
+    const [result] = await executor.query(
         `INSERT INTO pagos (pedido_id, amount, method, type, registered_by)
         VALUES (?, ?, ?, ?, ?)`,
         [pedidoId, amount, method, type, registeredBy]
     );
 
-    const [rows] = await pool.query(
+    const [rows] = await executor.query(
         `SELECT
             id,
             pedido_id AS pedidoId,

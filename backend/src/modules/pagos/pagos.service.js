@@ -1,3 +1,4 @@
+const pool = require('../../config/db');
 const pagosRepository = require('./pagos.repository');
 const pedidosRepository = require('../pedidos/pedidos.repository');
 const { PAYMENT_METHOD_VALUES, PAYMENT_TYPES } = require('../../constants/paymentMethods');
@@ -83,35 +84,64 @@ async function registerPayment(id, payload, currentUser) {
         throw error;
     }
 
-    const { pedido, totalPagado, saldoPendiente } = await getSaldo(pedidoId);
+    // Bloquea la fila del pedido dentro de una transaccion para leer el
+    // saldo e insertar el pago de forma atomica: sin esto, dos pagos
+    // concurrentes podrian leer el mismo saldo pendiente y sobrepasar el
+    // total del pedido.
+    const connection = await pool.getConnection();
 
-    if (saldoPendiente <= 0) {
-        const error = new Error('This pedido has no pending balance');
-        error.statusCode = 400;
-        throw error;
-    }
+    try {
+        await connection.beginTransaction();
 
-    if (amount > saldoPendiente) {
-        const error = new Error(
-            `amount (${amount}) exceeds the pending balance (${saldoPendiente})`
+        const pedido = await pedidosRepository.lockPedidoById(pedidoId, connection);
+
+        if (!pedido) {
+            const error = new Error('Pedido not found');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const totalPagado = round2(await pagosRepository.sumByPedidoId(pedidoId, connection));
+        const saldoPendiente = round2(Number(pedido.total) - totalPagado);
+
+        if (saldoPendiente <= 0) {
+            const error = new Error('This pedido has no pending balance');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (amount > saldoPendiente) {
+            const error = new Error(
+                `amount (${amount}) exceeds the pending balance (${saldoPendiente})`
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const type = resolvePaymentType({
+            totalPagadoAntes: totalPagado,
+            total: Number(pedido.total),
+            amount
+        });
+
+        await pagosRepository.create(
+            {
+                pedidoId,
+                amount,
+                method,
+                type,
+                registeredBy: currentUser.id
+            },
+            connection
         );
-        error.statusCode = 400;
+
+        await connection.commit();
+    } catch (error) {
+        await connection.rollback();
         throw error;
+    } finally {
+        connection.release();
     }
-
-    const type = resolvePaymentType({
-        totalPagadoAntes: totalPagado,
-        total: Number(pedido.total),
-        amount
-    });
-
-    await pagosRepository.create({
-        pedidoId,
-        amount,
-        method,
-        type,
-        registeredBy: currentUser.id
-    });
 
     return getPaymentSummary(pedidoId);
 }
