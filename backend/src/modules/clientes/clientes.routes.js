@@ -8,6 +8,9 @@ const router = express.Router();
 
 router.use(authenticateToken, authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN));
 
-router.get('/', clientesController.search);
+router.get('/', clientesController.list);
+router.get('/:id', clientesController.getById);
+router.post('/', clientesController.create);
+router.patch('/:id', clientesController.update);
 
 module.exports = router;

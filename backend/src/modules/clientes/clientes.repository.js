@@ -54,8 +54,84 @@ async function search(query, executor = pool) {
     return rows;
 }
 
+async function listPaginated({ cliente, page, pageSize }, executor = pool) {
+    const conditions = [];
+    const values = [];
+
+    if (cliente) {
+        conditions.push('(full_name LIKE ? OR phone_number LIKE ?)');
+        values.push(`%${cliente}%`, `%${cliente}%`);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const [countRows] = await executor.query(
+        `SELECT COUNT(*) AS total FROM clientes ${whereClause}`,
+        values
+    );
+    const total = countRows[0].total;
+
+    const offset = (page - 1) * pageSize;
+
+    const [rows] = await executor.query(
+        `SELECT
+            id,
+            full_name AS fullName,
+            phone_number AS phoneNumber,
+            email,
+            created_at AS createdAt
+        FROM clientes
+        ${whereClause}
+        ORDER BY full_name ASC
+        LIMIT ? OFFSET ?`,
+        [...values, pageSize, offset]
+    );
+
+    return {
+        data: rows,
+        pagination: {
+            page,
+            pageSize,
+            total,
+            totalPages: Math.max(1, Math.ceil(total / pageSize))
+        }
+    };
+}
+
+async function update(id, changes, executor = pool) {
+    const fields = [];
+    const values = [];
+
+    if (changes.fullName !== undefined) {
+        fields.push('full_name = ?');
+        values.push(changes.fullName);
+    }
+
+    if (changes.phoneNumber !== undefined) {
+        fields.push('phone_number = ?');
+        values.push(changes.phoneNumber);
+    }
+
+    if (changes.email !== undefined) {
+        fields.push('email = ?');
+        values.push(changes.email);
+    }
+
+    if (fields.length === 0) {
+        return findById(id, executor);
+    }
+
+    values.push(id);
+
+    await executor.query(`UPDATE clientes SET ${fields.join(', ')} WHERE id = ?`, values);
+
+    return findById(id, executor);
+}
+
 module.exports = {
     create,
     findById,
-    search
+    search,
+    listPaginated,
+    update
 };
