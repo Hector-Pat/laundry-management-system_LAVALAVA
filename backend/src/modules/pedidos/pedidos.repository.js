@@ -140,7 +140,8 @@ async function findPedidoById(id) {
             c.id AS clienteId,
             c.full_name AS clienteFullName,
             c.phone_number AS clientePhoneNumber,
-            c.email AS clienteEmail
+            c.email AS clienteEmail,
+            c.telegram_chat_id AS clienteTelegramChatId
         FROM pedidos p
         JOIN clientes c ON c.id = p.cliente_id
         WHERE p.id = ?
@@ -183,7 +184,8 @@ async function findPedidoById(id) {
             id: pedido.clienteId,
             fullName: pedido.clienteFullName,
             phoneNumber: pedido.clientePhoneNumber,
-            email: pedido.clienteEmail
+            email: pedido.clienteEmail,
+            telegramChatId: pedido.clienteTelegramChatId
         },
         items
     };

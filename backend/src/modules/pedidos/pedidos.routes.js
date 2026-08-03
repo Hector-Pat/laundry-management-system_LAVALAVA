@@ -185,7 +185,8 @@ router.get(
  *       solo la puede hacer un rol especifico (OPERADOR hasta LISTO, RECEPCIONISTA a ENTREGADO).
  *       Un ADMIN puede forzar cualquier estado valido, saltandose la secuencia; ese forzado
  *       queda registrado en la bitacora de auditoria. Al llegar a LISTO se intenta notificar
- *       al cliente por WhatsApp (best-effort, no bloquea la respuesta si falla).
+ *       al cliente por Telegram si ya vinculo su chat (best-effort, no bloquea
+ *       la respuesta si falla o si aun no lo ha vinculado).
  *     parameters:
  *       - $ref: '#/components/parameters/PedidoId'
  *     requestBody:

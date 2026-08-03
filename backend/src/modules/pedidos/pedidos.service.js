@@ -8,7 +8,7 @@ const authRepository = require('../auth/auth.repository');
 const auditoriaService = require('../auditoria/auditoria.service');
 const { ORDER_STATUSES, ORDER_STATUS_VALUES, ORDER_TRANSITIONS } = require('../../constants/orderStatus');
 const { USER_ROLES } = require('../../constants/roles');
-const { notifyPedidoListo } = require('../../utils/whatsappNotifier');
+const { notifyPedidoListo } = require('../../utils/telegramNotifier');
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
@@ -259,14 +259,15 @@ async function updateStatus(id, newStatus, currentUser) {
         }
     }
 
-    // Aviso al cliente (RF-04): no debe tumbar el cambio de estado si Twilio
-    // falla o no esta configurado, solo se deja constancia en el log.
+    // Aviso al cliente (RF-04): no debe tumbar el cambio de estado si Telegram
+    // falla, no esta configurado, o el cliente aun no vinculo su chat, solo se
+    // deja constancia en el log.
     if (newStatus === ORDER_STATUSES.LISTO) {
         try {
             await notifyPedidoListo(updated);
         } catch (notifyError) {
             console.warn(
-                `No se pudo notificar por WhatsApp el pedido ${updated.folio}: ${notifyError.message}`
+                `No se pudo notificar por Telegram el pedido ${updated.folio}: ${notifyError.message}`
             );
         }
     }

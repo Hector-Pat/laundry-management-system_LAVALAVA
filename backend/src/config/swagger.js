@@ -139,7 +139,13 @@ const options = {
                         id: { type: 'integer', example: 1 },
                         fullName: { type: 'string', example: 'Maria Lopez' },
                         phoneNumber: { type: 'string', example: '5512345678' },
-                        email: { type: 'string', format: 'email', nullable: true, example: 'maria@example.com' }
+                        email: { type: 'string', format: 'email', nullable: true, example: 'maria@example.com' },
+                        telegramChatId: {
+                            type: 'string',
+                            nullable: true,
+                            description: 'chat_id de Telegram vinculado (null si el cliente aun no le comparte su numero al bot).',
+                            example: '123456789'
+                        }
                     }
                 },
                 CreateClienteRequest: {

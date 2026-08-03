@@ -24,6 +24,7 @@ async function findById(id, executor = pool) {
             full_name AS fullName,
             phone_number AS phoneNumber,
             email,
+            telegram_chat_id AS telegramChatId,
             created_at AS createdAt
         FROM clientes
         WHERE id = ?
@@ -32,6 +33,39 @@ async function findById(id, executor = pool) {
     );
 
     return rows[0] || null;
+}
+
+// Usado por el bot de Telegram (telegramBot.js) para enlazar el chat_id de
+// quien comparte su contacto con su(s) registro(s) de cliente de mostrador.
+// Puede haber mas de un cliente con el mismo telefono (no hay UNIQUE), asi
+// que devuelve todos los que coincidan.
+async function findByPhoneNumber(phoneNumber, executor = pool) {
+    const [rows] = await executor.query(
+        `SELECT
+            id,
+            full_name AS fullName,
+            phone_number AS phoneNumber,
+            email,
+            telegram_chat_id AS telegramChatId,
+            created_at AS createdAt
+        FROM clientes
+        WHERE phone_number = ?
+        ORDER BY created_at DESC`,
+        [phoneNumber]
+    );
+
+    return rows;
+}
+
+// Vincula (o re-vincula) el chat_id de Telegram a todos los clientes con ese
+// telefono. Devuelve cuantos registros quedaron enlazados.
+async function linkTelegramChatId(phoneNumber, chatId, executor = pool) {
+    const [result] = await executor.query(
+        `UPDATE clientes SET telegram_chat_id = ? WHERE phone_number = ?`,
+        [chatId, phoneNumber]
+    );
+
+    return result.affectedRows;
 }
 
 async function search(query, executor = pool) {
@@ -43,6 +77,7 @@ async function search(query, executor = pool) {
             full_name AS fullName,
             phone_number AS phoneNumber,
             email,
+            telegram_chat_id AS telegramChatId,
             created_at AS createdAt
         FROM clientes
         WHERE full_name LIKE ? OR phone_number LIKE ? OR email LIKE ?
@@ -79,6 +114,7 @@ async function listPaginated({ cliente, page, pageSize }, executor = pool) {
             full_name AS fullName,
             phone_number AS phoneNumber,
             email,
+            telegram_chat_id AS telegramChatId,
             created_at AS createdAt
         FROM clientes
         ${whereClause}
@@ -162,6 +198,8 @@ async function findIdsByContact({ email, phoneNumber }, executor = pool) {
 module.exports = {
     create,
     findById,
+    findByPhoneNumber,
+    linkTelegramChatId,
     search,
     listPaginated,
     update,

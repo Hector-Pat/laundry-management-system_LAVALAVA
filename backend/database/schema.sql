@@ -36,11 +36,14 @@ VALUES (
 -- registrar un pedido (RNF-04). Quien sí quiera un portal de autoservicio se
 -- registra por separado en users con rol CLIENT.
 CREATE TABLE IF NOT EXISTS clientes (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  full_name     VARCHAR(150) NOT NULL,
-  phone_number  VARCHAR(10) NOT NULL,
-  email         VARCHAR(150),
-  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  id                INT AUTO_INCREMENT PRIMARY KEY,
+  full_name         VARCHAR(150) NOT NULL,
+  phone_number      VARCHAR(10) NOT NULL,
+  email             VARCHAR(150),
+  -- chat_id de Telegram (RF-04): se llena cuando el cliente le comparte su
+  -- numero al bot y coincide con este phone_number. Null = aun no vinculado.
+  telegram_chat_id  VARCHAR(32) NULL,
+  created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_clientes_full_name (full_name),
   INDEX idx_clientes_phone_number (phone_number)
 );

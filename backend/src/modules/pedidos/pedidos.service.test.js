@@ -5,7 +5,7 @@ jest.mock('../servicios/servicios.repository');
 jest.mock('../pagos/pagos.repository');
 jest.mock('../auth/auth.repository');
 jest.mock('../auditoria/auditoria.service');
-jest.mock('../../utils/whatsappNotifier');
+jest.mock('../../utils/telegramNotifier');
 
 const pedidosRepository = require('./pedidos.repository');
 const auditoriaService = require('../auditoria/auditoria.service');

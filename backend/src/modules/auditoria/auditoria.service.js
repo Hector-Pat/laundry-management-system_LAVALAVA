@@ -4,7 +4,7 @@ const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
 
 // Registra una accion sensible. Quien llama debe envolver esto en try/catch
-// (como whatsappNotifier): un fallo al auditar no debe tumbar la operacion
+// (como telegramNotifier): un fallo al auditar no debe tumbar la operacion
 // principal que se esta auditando.
 async function logAction(currentUser, action, entityType, entityId, details) {
     return auditoriaRepository.create({
