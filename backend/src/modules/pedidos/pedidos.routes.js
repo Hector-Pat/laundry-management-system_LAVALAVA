@@ -87,4 +87,10 @@ router.post(
     reclamacionesController.create
 );
 
+router.patch(
+    '/:id/reclamaciones/:reclamacionId/resolver',
+    authorizeRoles(USER_ROLES.RECEPCIONISTA, USER_ROLES.ADMIN),
+    reclamacionesController.resolve
+);
+
 module.exports = router;

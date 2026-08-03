@@ -6,7 +6,7 @@ import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidoById, updatePedidoStatus, cancelPedido } from '../../services/pedidos.service'
 import { getPagos, registerPago, voidPago } from '../../services/pagos.service'
-import { getReclamaciones, registerReclamacion } from '../../services/reclamaciones.service'
+import { getReclamaciones, registerReclamacion, resolveReclamacion } from '../../services/reclamaciones.service'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
 import { PAYMENT_METHOD_LABELS, PAYMENT_METHOD_VALUES, PAYMENT_TYPE_LABELS } from '../../constants/paymentMethods'
 import './PedidoDetailPage.css'
@@ -14,6 +14,7 @@ import './PedidoDetailPage.css'
 const PAGOS_ROLES = ['RECEPCIONISTA', 'ADMIN']
 const RECLAMACIONES_ROLES = ['RECEPCIONISTA', 'OPERADOR', 'ADMIN']
 const CANCEL_ROLES = ['RECEPCIONISTA', 'ADMIN']
+const RESOLVE_ROLES = ['RECEPCIONISTA', 'ADMIN']
 
 function formatCurrency(value) {
   return `$${Number(value).toFixed(2)}`
@@ -95,6 +96,8 @@ function PedidoDetailPage() {
   const [reclamaciones, setReclamaciones] = useState([])
   const [isLoadingReclamaciones, setIsLoadingReclamaciones] = useState(false)
   const [showReclamacionModal, setShowReclamacionModal] = useState(false)
+  const [resolvingReclamacion, setResolvingReclamacion] = useState(null)
+  const canResolveReclamaciones = RESOLVE_ROLES.includes(user?.role)
 
   const loadReclamaciones = useCallback(async () => {
     if (!canManageReclamaciones) return
@@ -433,9 +436,35 @@ function PedidoDetailPage() {
                 ) : (
                   <div className="border border-gray-100 rounded-xl divide-y divide-gray-100">
                     {reclamaciones.map((reclamacion) => (
-                      <div key={reclamacion.id} className="px-4 py-3">
-                        <p className="text-sm text-gray-800">{reclamacion.description}</p>
-                        <p className="text-xs text-gray-400 mt-1">{formatDateTime(reclamacion.createdAt)}</p>
+                      <div key={reclamacion.id} className="px-4 py-3 flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                reclamacion.status === 'RESUELTA'
+                                  ? 'bg-green-50 text-green-600'
+                                  : 'bg-amber-50 text-amber-600'
+                              }`}
+                            >
+                              {reclamacion.status === 'RESUELTA' ? 'Resuelta' : 'Abierta'}
+                            </span>
+                            <p className="text-xs text-gray-400">{formatDateTime(reclamacion.createdAt)}</p>
+                          </div>
+                          <p className="text-sm text-gray-800 mt-1">{reclamacion.description}</p>
+                          {reclamacion.status === 'RESUELTA' && (
+                            <p className="text-xs text-green-600 mt-1">
+                              Resuelto: {reclamacion.resolutionNotes}
+                            </p>
+                          )}
+                        </div>
+                        {canResolveReclamaciones && reclamacion.status !== 'RESUELTA' && (
+                          <button
+                            onClick={() => setResolvingReclamacion(reclamacion)}
+                            className="shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                          >
+                            Resolver
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -465,6 +494,17 @@ function PedidoDetailPage() {
             const created = await registerReclamacion(id, payload)
             setReclamaciones((prev) => [created, ...prev])
             setShowReclamacionModal(false)
+          }}
+        />
+      )}
+
+      {resolvingReclamacion && (
+        <ResolveReclamacionModal
+          onClose={() => setResolvingReclamacion(null)}
+          onSubmit={async (notes) => {
+            const updated = await resolveReclamacion(id, resolvingReclamacion.id, notes)
+            setReclamaciones((prev) => prev.map((item) => (item.id === updated.id ? updated : item)))
+            setResolvingReclamacion(null)
           }}
         />
       )}
@@ -746,6 +786,80 @@ function ReclamacionModal({ onClose, onSubmit }) {
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Registrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function ResolveReclamacionModal({ onClose, onSubmit }) {
+  const [notes, setNotes] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const isValid = notes.trim().length > 0
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isValid) return
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await onSubmit(notes.trim())
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo resolver la reclamación')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 text-lg">Resolver reclamación</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-500">¿Cómo se resolvió?</label>
+            <textarea
+              autoFocus
+              rows={4}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Ej. Se aplicó un descuento del 20% al pedido"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+              Marcar como resuelta
             </button>
           </div>
         </form>

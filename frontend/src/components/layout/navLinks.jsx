@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Users, Settings, Wallet, Shirt } from 'lucide-react'
+import { LayoutDashboard, Package, Users, Settings, Wallet, Shirt, ShieldAlert } from 'lucide-react'
 
 export function getNavLinks(role) {
   const links = [
@@ -9,6 +9,7 @@ export function getNavLinks(role) {
 
   if (role === 'RECEPCIONISTA' || role === 'ADMIN') {
     links.push({ icon: <Wallet size={18} />, label: 'Caja', path: '/caja' })
+    links.push({ icon: <ShieldAlert size={18} />, label: 'Reclamaciones', path: '/reclamaciones' })
   }
 
   if (role === 'ADMIN') {

@@ -13,6 +13,7 @@ import PedidoFormPage from '../pages/pedidos/PedidoFormPage'
 import PedidoDetailPage from '../pages/pedidos/PedidoDetailPage'
 import CajaPage from '../pages/caja/CajaPage'
 import ServiciosPage from '../pages/servicios/ServiciosPage'
+import ReclamacionesPage from '../pages/reclamaciones/ReclamacionesPage'
 
 const PEDIDOS_STAFF_ROLES = ['RECEPCIONISTA', 'OPERADOR', 'ADMIN']
 const PEDIDOS_CREATE_ROLES = ['RECEPCIONISTA', 'ADMIN']
@@ -80,6 +81,11 @@ function AppRouter() {
         <Route path="/servicios" element={
           <ProtectedRoute roles={['ADMIN']}>
             <ServiciosPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/reclamaciones" element={
+          <ProtectedRoute roles={RECEPCION_ADMIN_ROLES}>
+            <ReclamacionesPage />
           </ProtectedRoute>
         } />
       </Routes>
