@@ -1,1 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+/*
+ * Sistema de diseño — Lava-Lava
+ * ------------------------------------------------------------------
+ * Paleta (usar SIEMPRE estos tokens en vez de colores sueltos de Tailwind):
+ *   bg-linen / text-linen         #F7F6F2  fondo general de la app
+ *   bg-surface / text-surface     #FFFFFF  tarjetas y superficies elevadas
+ *   bg-ink / text-ink             #1F2A2A  texto principal, superficies oscuras
+ *   bg-ink-deep / text-ink-deep   #141C1B  variante más oscura de ink (sidebar)
+ *   bg-detergent / text-detergent #0F5C56  color de marca: acciones primarias,
+ *                                          links, sidebar activo, focus rings
+ *   bg-detergent-hover / text-detergent-hover
+ *                                 #0C4A45  hover del color de marca (derivado,
+ *                                          no un tono aleatorio)
+ *   bg-tag / text-tag             #E08A3C  acento cálido: estados "en proceso",
+ *                                          pendientes, elemento de firma
+ *   bg-sage / text-sage           #3C7A5E  estados completados/entregados
+ *   bg-danger / text-danger       #B5493A  rojo apagado para estados cancelados
+ *                                          (evitar el red-600 saturado de Tailwind)
+ *
+ * Cualquier opacidad de estos colores (ej. bg-tag/10, text-detergent/70) es
+ * válida y se prefiere sobre inventar un nuevo tono.
+ *
+ * Tipografía:
+ *   font-sans (default) → Manrope, para títulos y texto general.
+ *   font-mono           → IBM Plex Mono, exclusiva para folios, montos,
+ *                          fechas/horas y cualquier ID o código — les da un
+ *                          aire de "recibo impreso" consistente en toda la app.
+ *
+ * Motivo de "boleto":
+ *   .ticket-edge → borde perforado (superior punteado + dos "agujeros") para
+ *   tarjetas de pedido y KPIs. Mismo lenguaje visual que el ticket impreso
+ *   de PedidoDetailPage (ver PedidoDetailPage.css).
+ *
+ * Nota: index.css define un tema oscuro aparte, usado solo por las pantallas
+ * de autenticación (Login/Register). No mezclar esos tokens con los de aquí.
+ * ------------------------------------------------------------------
+ */
+
+@theme {
+  --color-linen: #f7f6f2;
+  --color-surface: #ffffff;
+  --color-ink: #1f2a2a;
+  --color-ink-deep: #141c1b;
+  --color-detergent: #0f5c56;
+  --color-detergent-hover: #0c4a45;
+  --color-tag: #e08a3c;
+  --color-sage: #3c7a5e;
+  --color-danger: #b5493a;
+
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Motivo de "boleto": borde perforado en la parte superior de tarjetas de
+   pedido y KPIs, para que se sientan parte del mismo objeto visual que el
+   ticket impreso (PedidoDetailPage.css). Los "agujeros" usan el color del
+   fondo general (linen) para simular una perforación real. */
+.ticket-edge {
+  position: relative;
+  border-top: 2px dashed color-mix(in srgb, var(--color-ink) 18%, transparent);
+}
+
+.ticket-edge::before,
+.ticket-edge::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  width: 13px;
+  height: 13px;
+  border-radius: 9999px;
+  background: var(--color-linen);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+}
+
+.ticket-edge::before {
+  left: 14px;
+}
+
+.ticket-edge::after {
+  right: 14px;
+}
