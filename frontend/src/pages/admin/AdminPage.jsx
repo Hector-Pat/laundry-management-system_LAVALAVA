@@ -99,7 +99,7 @@ function CreateUserModal({ onClose, onCreated }) {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-detergent"
             >
               {STAFF_ROLE_OPTIONS.map((value) => (
                 <option key={value} value={value}>
@@ -299,7 +299,7 @@ function AdminPage() {
           </div>
         )}
 
-        <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div className="flex-1 bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col">
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
               <Loader2 size={32} className="animate-spin" />
@@ -314,7 +314,7 @@ function AdminPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                <thead className="bg-linen text-ink/60 uppercase text-xs tracking-wide border-b border-black/10">
                   <tr>
                     <th className="px-6 py-3 font-semibold">Nombre</th>
                     <th className="px-6 py-3 font-semibold">Correo</th>
@@ -323,13 +323,13 @@ function AdminPage() {
                     <th className="px-6 py-3 font-semibold text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-black/8">
                   {users.map((rowUser) => {
                     const isSelf = rowUser.id === user?.id
                     const isRowUpdating = updatingId === rowUser.id
 
                     return (
-                      <tr key={rowUser.id} className="hover:bg-gray-50">
+                      <tr key={rowUser.id} className="hover:bg-linen/70">
                         <td className="px-6 py-4 font-medium text-ink">
                           {rowUser.fullName}
                           {isSelf && <span className="ml-2 text-xs text-detergent font-normal">(tú)</span>}

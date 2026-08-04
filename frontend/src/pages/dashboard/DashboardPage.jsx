@@ -151,7 +151,7 @@ function DashboardPage() {
         )}
 
         {isLoading ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm text-gray-400">
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-white rounded-2xl border border-black/10 shadow-sm text-gray-400">
             <Loader2 size={32} className="animate-spin" />
             <p className="text-sm font-medium">Cargando datos del panel...</p>
           </div>

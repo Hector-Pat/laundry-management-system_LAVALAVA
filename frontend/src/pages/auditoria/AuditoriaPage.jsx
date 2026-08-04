@@ -90,7 +90,7 @@ function AuditoriaPage() {
           </div>
         )}
 
-        <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div className="flex-1 bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col">
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
               <Loader2 size={32} className="animate-spin" />
@@ -105,7 +105,7 @@ function AuditoriaPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                <thead className="bg-linen text-ink/60 uppercase text-xs tracking-wide border-b border-black/10">
                   <tr>
                     <th className="px-6 py-3 font-semibold">Fecha</th>
                     <th className="px-6 py-3 font-semibold">Usuario</th>
@@ -114,9 +114,9 @@ function AuditoriaPage() {
                     <th className="px-6 py-3 font-semibold">Detalles</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-black/8">
                   {entries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-gray-50">
+                    <tr key={entry.id} className="hover:bg-linen/70">
                       <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDateTime(entry.createdAt)}</td>
                       <td className="px-6 py-4 font-medium text-ink">{entry.userFullName || '—'}</td>
                       <td className="px-6 py-4">
@@ -138,7 +138,7 @@ function AuditoriaPage() {
           )}
 
           {!isLoading && entries.length > 0 && (
-            <div className="flex items-center justify-between px-6 py-3 border-t border-gray-100">
+            <div className="flex items-center justify-between px-6 py-3 border-t border-black/10">
               <span className="text-xs text-gray-400">
                 Página {pagination.page} de {pagination.totalPages} · {pagination.total} registros
               </span>

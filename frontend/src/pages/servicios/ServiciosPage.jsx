@@ -186,7 +186,7 @@ function ServiciosPage() {
           </div>
         )}
 
-        <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div className="flex-1 bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col">
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
               <Loader2 size={32} className="animate-spin" />
@@ -201,7 +201,7 @@ function ServiciosPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                <thead className="bg-linen text-ink/60 uppercase text-xs tracking-wide border-b border-black/10">
                   <tr>
                     <th className="px-6 py-3 font-semibold">Nombre</th>
                     <th className="px-6 py-3 font-semibold">Precio</th>
@@ -209,12 +209,12 @@ function ServiciosPage() {
                     <th className="px-6 py-3 font-semibold text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-black/8">
                   {servicios.map((servicio) => {
                     const isRowUpdating = updatingId === servicio.id
 
                     return (
-                      <tr key={servicio.id} className="hover:bg-gray-50">
+                      <tr key={servicio.id} className="hover:bg-linen/70">
                         <td className="px-6 py-4 font-medium text-ink">{servicio.name}</td>
                         <td className="px-6 py-4 text-gray-500">{formatCurrency(servicio.price)}</td>
                         <td className="px-6 py-4">

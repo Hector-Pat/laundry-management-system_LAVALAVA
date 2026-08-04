@@ -164,7 +164,7 @@ function CajaPage() {
         ) : corte ? (
           <div className="flex flex-col gap-5">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-3">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex items-center gap-3">
                 <div className="bg-green-50 text-sage rounded-xl p-2.5">
                   <TrendingUp size={20} />
                 </div>
@@ -173,7 +173,7 @@ function CajaPage() {
                   <p className="text-xl font-extrabold text-ink">{formatCurrency(corte.ingresos)}</p>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-3">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex items-center gap-3">
                 <div className="bg-red-50 text-red-600 rounded-xl p-2.5">
                   <TrendingDown size={20} />
                 </div>
@@ -182,7 +182,7 @@ function CajaPage() {
                   <p className="text-xl font-extrabold text-ink">{formatCurrency(corte.egresos)}</p>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-3">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex items-center gap-3">
                 <div className="bg-detergent/10 text-detergent rounded-xl p-2.5">
                   <Wallet size={20} />
                 </div>
@@ -194,14 +194,14 @@ function CajaPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-                <div className="px-6 py-3 border-b border-gray-100">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col">
+                <div className="px-6 py-3 border-b border-black/10">
                   <h2 className="font-semibold text-ink">Pagos cobrados</h2>
                 </div>
                 {corte.pagos.length === 0 ? (
                   <p className="text-sm text-gray-400 px-6 py-6 text-center">Sin pagos registrados</p>
                 ) : (
-                  <div className="divide-y divide-gray-100 overflow-y-auto max-h-80">
+                  <div className="divide-y divide-black/8 overflow-y-auto max-h-80">
                     {corte.pagos.map((pago) => (
                       <div key={pago.id} className="flex items-center justify-between px-6 py-3 text-sm">
                         <div>
@@ -217,15 +217,15 @@ function CajaPage() {
                 )}
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
-                <div className="px-6 py-3 border-b border-gray-100">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm flex flex-col">
+                <div className="px-6 py-3 border-b border-black/10">
                   <h2 className="font-semibold text-ink">Egresos</h2>
                 </div>
 
                 {corte.gastos.length === 0 ? (
                   <p className="text-sm text-gray-400 px-6 py-6 text-center">Sin egresos registrados</p>
                 ) : (
-                  <div className="divide-y divide-gray-100 overflow-y-auto max-h-56">
+                  <div className="divide-y divide-black/8 overflow-y-auto max-h-56">
                     {corte.gastos.map((item) => (
                       <div key={item.id} className="flex items-center justify-between px-6 py-3 text-sm">
                         <div>
@@ -238,7 +238,7 @@ function CajaPage() {
                   </div>
                 )}
 
-                <form onSubmit={handleAddGasto} className="p-4 border-t border-gray-100 flex flex-col gap-2">
+                <form onSubmit={handleAddGasto} className="p-4 border-t border-black/10 flex flex-col gap-2">
                   {gastoError && (
                     <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs rounded-lg px-3 py-2">
                       <AlertCircle size={14} />
@@ -277,7 +277,7 @@ function CajaPage() {
           </div>
         ) : null}
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
+        <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
               <h2 className="font-semibold text-ink">Reporte por rango de fechas</h2>
@@ -330,9 +330,9 @@ function CajaPage() {
           ) : !reporte || reporte.dias.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">Sin movimientos en el rango seleccionado</p>
           ) : (
-            <div className="overflow-x-auto border border-gray-100 rounded-xl">
+            <div className="overflow-x-auto border border-black/10 rounded-xl">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                <thead className="bg-linen text-ink/60 uppercase text-xs tracking-wide border-b border-black/10">
                   <tr>
                     <th className="px-4 py-2 font-semibold">Fecha</th>
                     <th className="px-4 py-2 font-semibold">Ingresos</th>
@@ -340,7 +340,7 @@ function CajaPage() {
                     <th className="px-4 py-2 font-semibold">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-black/8">
                   {reporte.dias.map((dia) => (
                     <tr key={dia.date}>
                       <td className="px-4 py-2 text-gray-700">{dia.date}</td>

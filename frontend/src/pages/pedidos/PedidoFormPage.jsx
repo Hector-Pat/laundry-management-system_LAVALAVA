@@ -250,7 +250,7 @@ function PedidoFormPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 flex-1 min-h-0">
           {/* Cliente */}
           {isEditMode ? (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+            <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex flex-col gap-3">
               <h2 className="font-semibold text-ink">Cliente</h2>
               <div className="bg-gray-50 rounded-xl px-4 py-3">
                 <p className="font-semibold text-ink">{editablePedido?.cliente.fullName}</p>
@@ -261,7 +261,7 @@ function PedidoFormPage() {
               </p>
             </div>
           ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+          <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-ink">Cliente</h2>
               <button
@@ -315,7 +315,7 @@ function PedidoFormPage() {
                   )}
 
                   {!isSearching && searchResults.length > 0 && (
-                    <div className="mt-2 border border-gray-100 rounded-xl divide-y divide-gray-100 max-h-56 overflow-y-auto">
+                    <div className="mt-2 border border-black/10 rounded-xl divide-y divide-black/8 max-h-56 overflow-y-auto">
                       {searchResults.map((cliente) => (
                         <button
                           type="button"
@@ -373,7 +373,7 @@ function PedidoFormPage() {
           )}
 
           {/* Servicios */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3 min-h-0">
+          <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex flex-col gap-3 min-h-0">
             <h2 className="font-semibold text-ink">Servicios</h2>
 
             {isLoadingServicios ? (
@@ -390,7 +390,7 @@ function PedidoFormPage() {
                     <div
                       key={servicio.id}
                       className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-colors ${
-                        isChecked ? 'border-detergent/30 bg-detergent/10' : 'border-gray-100'
+                        isChecked ? 'border-detergent/30 bg-detergent/10' : 'border-black/10'
                       }`}
                     >
                       <label className="flex items-center gap-3 flex-1 cursor-pointer">
@@ -434,7 +434,7 @@ function PedidoFormPage() {
         </div>
 
         {/* Total en vivo + submit */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between gap-4 flex-wrap">
+        <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</p>
             <p className="text-3xl font-extrabold text-ink">{formatCurrency(total)}</p>

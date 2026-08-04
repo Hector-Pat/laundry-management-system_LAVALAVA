@@ -232,7 +232,7 @@ function PedidoDetailPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-5">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Folio</p>
                 <h1 className="text-3xl font-extrabold text-ink">{pedido.folio}</h1>
@@ -277,9 +277,9 @@ function PedidoDetailPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="lg:col-span-2 bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <thead className="bg-linen text-ink/60 uppercase text-xs tracking-wide border-b border-black/10">
                     <tr>
                       <th className="px-6 py-3 font-semibold">Servicio</th>
                       <th className="px-6 py-3 font-semibold">Cantidad</th>
@@ -287,7 +287,7 @@ function PedidoDetailPage() {
                       <th className="px-6 py-3 font-semibold text-right">Subtotal</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-black/8">
                     {pedido.items.map((item) => (
                       <tr key={item.id}>
                         <td className="px-6 py-3 font-medium text-ink">{item.servicioName}</td>
@@ -312,7 +312,7 @@ function PedidoDetailPage() {
                 </table>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-6 flex flex-col gap-4">
                 <div>
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Cliente</p>
                   <p className="font-semibold text-ink">{pedido.cliente.fullName}</p>
@@ -320,7 +320,7 @@ function PedidoDetailPage() {
                   {pedido.cliente.email && <p className="text-sm text-gray-500">{pedido.cliente.email}</p>}
                 </div>
 
-                <div className="flex flex-col items-center gap-2 pt-2 border-t border-gray-100">
+                <div className="flex flex-col items-center gap-2 pt-2 border-t border-black/10">
                   <img src={pedido.qrCode} alt={`Código QR del folio ${pedido.folio}`} className="w-32 h-32" />
                   <p className="text-xs text-gray-400">Escanea para identificar el pedido</p>
                 </div>
@@ -328,7 +328,7 @@ function PedidoDetailPage() {
             </div>
 
             {canManagePagos && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-6 flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <h2 className="font-semibold text-ink">Pagos</h2>
                   {paymentSummary && paymentSummary.saldoPendiente > 0 && !pedido.cancelledAt && (
@@ -366,7 +366,7 @@ function PedidoDetailPage() {
                     </div>
 
                     {paymentSummary.pagos.length > 0 && (
-                      <div className="border border-gray-100 rounded-xl divide-y divide-gray-100">
+                      <div className="border border-black/10 rounded-xl divide-y divide-black/8">
                         {paymentSummary.pagos.map((pago) => (
                           <div
                             key={pago.id}
@@ -410,7 +410,7 @@ function PedidoDetailPage() {
             )}
 
             {canManageReclamaciones && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
+              <div className="bg-white rounded-2xl border border-black/10 shadow-sm p-6 flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <h2 className="font-semibold text-ink">Daños y reclamaciones</h2>
                   <button
@@ -432,7 +432,7 @@ function PedidoDetailPage() {
                     No hay daños ni reclamaciones registrados.
                   </p>
                 ) : (
-                  <div className="border border-gray-100 rounded-xl divide-y divide-gray-100">
+                  <div className="border border-black/10 rounded-xl divide-y divide-black/8">
                     {reclamaciones.map((reclamacion) => (
                       <div key={reclamacion.id} className="px-4 py-3 flex items-start justify-between gap-3">
                         <div>
@@ -685,7 +685,7 @@ function PaymentModal({ saldoPendiente, onClose, onSubmit }) {
             <select
               value={method}
               onChange={(e) => setMethod(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-detergent"
             >
               {PAYMENT_METHOD_VALUES.map((value) => (
                 <option key={value} value={value}>

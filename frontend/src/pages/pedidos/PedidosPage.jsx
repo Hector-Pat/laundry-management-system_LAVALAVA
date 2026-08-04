@@ -104,7 +104,7 @@ function PedidosPage() {
           )}
         </div>
 
-        <div className="flex items-end gap-3 flex-wrap bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <div className="flex items-end gap-3 flex-wrap bg-white rounded-2xl border border-black/10 shadow-sm p-4">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-gray-500">Estado</label>
             <select
@@ -171,7 +171,7 @@ function PedidosPage() {
           </div>
         )}
 
-        <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div className="flex-1 bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col">
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
               <Loader2 size={32} className="animate-spin" />
@@ -186,7 +186,7 @@ function PedidosPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                <thead className="bg-linen text-ink/60 uppercase text-xs tracking-wide border-b border-black/10">
                   <tr>
                     <th className="px-6 py-3 font-semibold">Folio</th>
                     <th className="px-6 py-3 font-semibold">Cliente</th>
@@ -196,9 +196,9 @@ function PedidosPage() {
                     <th className="px-6 py-3 font-semibold text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-black/8">
                   {pedidos.map((pedido) => (
-                    <tr key={pedido.id} className="hover:bg-gray-50">
+                    <tr key={pedido.id} className="hover:bg-linen/70">
                       <td className="px-6 py-4 font-semibold text-ink">{pedido.folio}</td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
@@ -227,7 +227,7 @@ function PedidosPage() {
           )}
 
           {!isLoading && pedidos.length > 0 && (
-            <div className="flex items-center justify-between px-6 py-3 border-t border-gray-100">
+            <div className="flex items-center justify-between px-6 py-3 border-t border-black/10">
               <span className="text-xs text-gray-400">
                 Página {pagination.page} de {pagination.totalPages} · {pagination.total} pedidos
               </span>
