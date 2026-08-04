@@ -33,7 +33,7 @@ function ChangePasswordModal({ onClose }) {
     <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">Cambiar contraseña</h2>
+          <h2 className="font-semibold text-ink text-lg">Cambiar contraseña</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
@@ -41,11 +41,11 @@ function ChangePasswordModal({ onClose }) {
 
         {success ? (
           <div className="flex flex-col items-center gap-3 py-4 text-center">
-            <CheckCircle2 size={32} className="text-green-500" />
+            <CheckCircle2 size={32} className="text-sage" />
             <p className="text-sm text-gray-600">Tu contraseña se actualizó correctamente.</p>
             <button
               onClick={onClose}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
             >
               Cerrar
             </button>
@@ -67,7 +67,7 @@ function ChangePasswordModal({ onClose }) {
                   autoFocus
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                 />
               </div>
 
@@ -77,7 +77,7 @@ function ChangePasswordModal({ onClose }) {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                 />
               </div>
 
@@ -87,7 +87,7 @@ function ChangePasswordModal({ onClose }) {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                 />
                 {confirmPassword.length > 0 && confirmPassword !== newPassword && (
                   <p className="text-xs text-red-500 mt-1">Las contraseñas no coinciden.</p>
@@ -105,7 +105,7 @@ function ChangePasswordModal({ onClose }) {
                 <button
                   type="submit"
                   disabled={!isValid || isSubmitting}
-                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+                  className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
                 >
                   {isSubmitting && <Loader2 size={14} className="animate-spin" />}
                   Guardar
@@ -124,14 +124,14 @@ function Navbar({ userName = 'Ana García', userRole = 'Recepcionista', onLogout
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-3 flex items-center justify-between shrink-0 print:hidden">
-      <span className="text-2xl font-extrabold text-indigo-600 tracking-widest">
+      <span className="text-2xl font-extrabold text-detergent tracking-widest">
         LAVALAVA
       </span>
 
       <div className="flex items-center gap-4">
         <div className="text-right">
-          <p className="text-sm font-semibold text-gray-800 leading-tight">{userName}</p>
-          <p className="text-xs text-indigo-500 font-medium">{userRole}</p>
+          <p className="text-sm font-semibold text-ink leading-tight">{userName}</p>
+          <p className="text-xs text-detergent font-medium">{userRole}</p>
         </div>
         <button
           onClick={() => setShowChangePassword(true)}

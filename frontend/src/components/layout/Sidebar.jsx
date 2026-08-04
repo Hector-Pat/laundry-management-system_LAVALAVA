@@ -2,9 +2,9 @@ import { NavLink } from 'react-router-dom'
 
 function Sidebar({ navLinks = [] }) {
   return (
-    <aside className="w-64 bg-gray-900 text-white flex flex-col shrink-0 h-full print:hidden">
-      <div className="px-6 py-5 border-b border-gray-700">
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Menú</p>
+    <aside className="w-64 bg-gradient-to-b from-ink to-ink-deep text-white flex flex-col shrink-0 h-full print:hidden">
+      <div className="px-6 py-5 border-b border-white/10">
+        <p className="text-xs font-bold text-white/40 uppercase tracking-widest">Menú</p>
       </div>
 
       <nav className="flex-1 p-4 flex flex-col gap-1">
@@ -14,10 +14,10 @@ function Sidebar({ navLinks = [] }) {
             to={link.path}
             end={link.end ?? true}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-4 rounded-xl text-sm font-semibold transition-colors ${
+              `flex items-center gap-3 px-4 py-4 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-detergent ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-detergent text-white shadow-md'
+                  : 'text-white/60 hover:bg-white/5 hover:text-white'
               }`
             }
           >
