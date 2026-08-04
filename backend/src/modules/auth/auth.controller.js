@@ -4,11 +4,19 @@ const authService = require('./auth.service');
 // token via XSS, a diferencia de guardarlo en localStorage). Sin maxAge:
 // es una cookie de sesion, y de todas formas el JWT deja de ser valido
 // cuando expira (JWT_EXPIRES_IN) sin importar si la cookie sigue viva.
+//
+// sameSite 'none' en produccion: frontend (Vercel) y backend (Render)
+// estan en dominios distintos, y 'lax' bloquea el envio de la cookie
+// entre sitios. 'none' solo es valido con secure: true (los navegadores
+// la rechazan sin eso), que ya esta activo en produccion. En desarrollo
+// local ambos corren en localhost, asi que se mantiene 'lax'.
 function cookieOptions() {
+    const isProduction = process.env.NODE_ENV === 'production';
+
     return {
         httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production'
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction
     };
 }
 
