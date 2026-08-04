@@ -35,11 +35,13 @@
   --topbar-height: 70px;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* El reset de box-sizing/margin/padding vive en el Preflight de Tailwind
+   (@layer base, vía "@import tailwindcss" en App.css) — tenerlo aquí
+   también, sin capa, le ganaba a cualquier utilidad de padding o margin
+   de Tailwind en todo el proyecto sin importar especificidad ni orden
+   (mismo mecanismo que el de "a" más abajo), dejando el padding y el
+   margin en 0 pese a que la clase estuviera aplicada. Ver Preflight de
+   Tailwind para el reset equivalente. */
 
 body {
   font-family: 'Inter', sans-serif;
