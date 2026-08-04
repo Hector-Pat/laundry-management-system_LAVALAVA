@@ -144,27 +144,6 @@ function OperadorPage() {
           <p className="text-sm text-gray-400 mt-0.5 capitalize">{today}</p>
         </div>
 
-        <div className="flex items-end gap-3 flex-wrap bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-semibold text-gray-500">Estado</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value)
-                setPage(1)
-              }}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
-            >
-              <option value="">Activos</option>
-              {Object.keys(ORDER_STATUS_LABELS).map((value) => (
-                <option key={value} value={value}>
-                  {ORDER_STATUS_LABELS[value]}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
         {error && (
           <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">
             <AlertCircle size={18} />
@@ -172,7 +151,28 @@ function OperadorPage() {
           </div>
         )}
 
-        <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div className="flex-1 bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col">
+          <div className="flex items-end gap-3 flex-wrap border-b border-black/10 p-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-gray-500">Estado</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value)
+                  setPage(1)
+                }}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
+              >
+                <option value="">Activos</option>
+                {Object.keys(ORDER_STATUS_LABELS).map((value) => (
+                  <option key={value} value={value}>
+                    {ORDER_STATUS_LABELS[value]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
               <Loader2 size={32} className="animate-spin" />
@@ -187,7 +187,7 @@ function OperadorPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                <thead className="bg-linen text-ink/60 uppercase text-xs tracking-wide border-b border-black/10">
                   <tr>
                     <th className="px-6 py-3 font-semibold">Folio</th>
                     <th className="px-6 py-3 font-semibold">Cliente</th>
@@ -196,7 +196,7 @@ function OperadorPage() {
                     <th className="px-6 py-3 font-semibold text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-black/8">
                   {pedidos.map((pedido) => {
                     const transition = ORDER_TRANSITIONS[pedido.status]
                     const canAdvance =
@@ -205,7 +205,7 @@ function OperadorPage() {
 
                     return (
                       <Fragment key={pedido.id}>
-                        <tr className="hover:bg-gray-50">
+                        <tr className="hover:bg-linen/70">
                           <td className="px-6 py-4 font-semibold text-ink">{pedido.folio}</td>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
@@ -230,12 +230,12 @@ function OperadorPage() {
                               <button
                                 onClick={() => handleAdvance(pedido)}
                                 disabled={advancingId === pedido.id}
-                                className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors text-xs"
+                                className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 text-white font-medium px-4 py-2 rounded-lg transition-colors text-sm"
                               >
                                 {advancingId === pedido.id ? (
-                                  <Loader2 size={12} className="animate-spin" />
+                                  <Loader2 size={14} className="animate-spin" />
                                 ) : (
-                                  <ArrowRight size={12} />
+                                  <ArrowRight size={14} />
                                 )}
                                 {ORDER_STATUS_LABELS[transition.next]}
                               </button>
@@ -279,7 +279,7 @@ function OperadorPage() {
           )}
 
           {!isLoading && pedidos.length > 0 && (
-            <div className="flex items-center justify-between px-6 py-3 border-t border-gray-100">
+            <div className="flex items-center justify-between px-6 py-3 border-t border-black/10">
               <span className="text-xs text-gray-400">
                 Página {pagination.page} de {pagination.totalPages} · {pagination.total} pedidos
               </span>
