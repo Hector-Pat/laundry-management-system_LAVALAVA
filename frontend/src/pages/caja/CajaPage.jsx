@@ -135,7 +135,7 @@ function CajaPage() {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold text-ink">Corte de caja</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Ingresos, egresos y total del día (RF-08)</p>
+            <p className="text-sm text-gray-400 mt-0.5">Ingresos, egresos y total del día</p>
           </div>
 
           <div className="flex flex-col gap-1">
