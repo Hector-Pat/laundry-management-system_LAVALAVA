@@ -3,7 +3,7 @@ import Sidebar from './Sidebar'
 
 function MainLayout({ children, navLinks = [], userName, userRole, onLogout }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-linen print:block print:h-auto print:overflow-visible">
+    <div className="flex h-screen overflow-hidden bg-linen font-sans print:block print:h-auto print:overflow-visible">
       <Sidebar navLinks={navLinks} />
 
       <div className="flex flex-col flex-1 overflow-hidden print:block">

@@ -24,10 +24,15 @@
  * válida y se prefiere sobre inventar un nuevo tono.
  *
  * Tipografía:
- *   font-sans (default) → Manrope, para títulos y texto general.
- *   font-mono           → IBM Plex Mono, exclusiva para folios, montos,
- *                          fechas/horas y cualquier ID o código — les da un
- *                          aire de "recibo impreso" consistente en toda la app.
+ *   font-sans → Manrope, para títulos y texto general. Se aplica en
+ *               MainLayout (font-sans en su div raíz), así que cualquier
+ *               pantalla dentro del shell principal ya la hereda.
+ *   font-mono → IBM Plex Mono, exclusiva para folios, montos, fechas/horas
+ *               y cualquier ID o código — les da un aire de "recibo
+ *               impreso" consistente en toda la app.
+ *
+ * Nota: las pantallas de Login/Register no usan MainLayout y mantienen su
+ * propia tipografía (Inter, ver index.css) — quedan fuera de este sistema.
  *
  * Motivo de "boleto":
  *   .ticket-edge → borde perforado (superior punteado + dos "agujeros") para
@@ -52,10 +57,6 @@
 
   --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
-}
-
-body {
-  font-family: var(--font-sans);
 }
 
 /* Motivo de "boleto": borde perforado en la parte superior de tarjetas de
