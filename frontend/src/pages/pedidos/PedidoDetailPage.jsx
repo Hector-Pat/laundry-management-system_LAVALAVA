@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Printer, Receipt, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert, ShieldCheck, Pencil } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
@@ -122,14 +122,18 @@ function PedidoDetailPage() {
   // es el comprobante completo con servicios y saldo. Solo uno se renderiza
   // a la vez (ver bloques print:* mas abajo), y se imprime tras el
   // re-render para que el bloque correcto ya este en el DOM.
-  const [printMode, setPrintMode] = useState('etiqueta')
-  const isFirstPrintRender = useRef(true)
+  //
+  // printMode empieza en null ("no se ha pedido imprimir") en vez de en un
+  // modo valido: bajo StrictMode, este efecto se invoca dos veces al montar
+  // (monta -> efecto -> limpieza -> efecto de nuevo), asi que un guard basado
+  // en "es la primera vez que corre" se activa en la invocacion equivocada y
+  // dispara window.print() con solo entrar al detalle del pedido. Que el
+  // guard dependa del valor (no hay modo -> no imprimir) es correcto sin
+  // importar cuantas veces se invoque el efecto.
+  const [printMode, setPrintMode] = useState(null)
 
   useEffect(() => {
-    if (isFirstPrintRender.current) {
-      isFirstPrintRender.current = false
-      return undefined
-    }
+    if (!printMode) return undefined
 
     const raf = requestAnimationFrame(() => window.print())
     return () => cancelAnimationFrame(raf)
