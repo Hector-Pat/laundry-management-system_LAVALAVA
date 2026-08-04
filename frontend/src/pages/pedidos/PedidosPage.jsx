@@ -5,7 +5,8 @@ import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidos } from '../../services/pedidos.service'
-import { ORDER_STATUS_LABELS, ORDER_STATUS_VALUES, ORDER_STATUS_COLORS } from '../../constants/orderStatus'
+import { ORDER_STATUS_LABELS, ORDER_STATUS_VALUES } from '../../constants/orderStatus'
+import EstadoBadge from '../../components/ui/EstadoBadge'
 
 const PAGE_SIZE = 10
 
@@ -203,13 +204,7 @@ function PedidosPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            pedido.cancelledAt ? 'bg-red-50 text-red-600' : ORDER_STATUS_COLORS[pedido.status]
-                          }`}
-                        >
-                          {pedido.cancelledAt ? 'Cancelado' : ORDER_STATUS_LABELS[pedido.status]}
-                        </span>
+                        <EstadoBadge status={pedido.cancelledAt ? 'CANCELADO' : pedido.status} />
                       </td>
                       <td className="px-6 py-4 font-semibold text-gray-800">{formatCurrency(pedido.total)}</td>
                       <td className="px-6 py-4 text-gray-500">{formatDateTime(pedido.createdAt)}</td>

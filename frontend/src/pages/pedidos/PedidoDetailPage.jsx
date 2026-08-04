@@ -7,8 +7,9 @@ import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidoById, updatePedidoStatus, cancelPedido } from '../../services/pedidos.service'
 import { getPagos, registerPago, voidPago } from '../../services/pagos.service'
 import { getReclamaciones, registerReclamacion, resolveReclamacion } from '../../services/reclamaciones.service'
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
+import { ORDER_STATUS_LABELS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
 import { PAYMENT_METHOD_LABELS, PAYMENT_METHOD_VALUES, PAYMENT_TYPE_LABELS } from '../../constants/paymentMethods'
+import EstadoBadge from '../../components/ui/EstadoBadge'
 import './PedidoDetailPage.css'
 
 const PAGOS_ROLES = ['RECEPCIONISTA', 'ADMIN']
@@ -239,13 +240,7 @@ function PedidoDetailPage() {
               </div>
 
               <div className="flex flex-col items-start md:items-end gap-2">
-                <span
-                  className={`inline-flex px-3 py-1.5 rounded-full text-sm font-semibold ${
-                    pedido.cancelledAt ? 'bg-red-50 text-red-600' : ORDER_STATUS_COLORS[pedido.status]
-                  }`}
-                >
-                  {pedido.cancelledAt ? 'Cancelado' : ORDER_STATUS_LABELS[pedido.status]}
-                </span>
+                <EstadoBadge status={pedido.cancelledAt ? 'CANCELADO' : pedido.status} size="md" />
 
                 {pedido.cancelledAt ? (
                   <p className="text-xs text-gray-400 text-right max-w-xs">
@@ -254,7 +249,7 @@ function PedidoDetailPage() {
                   </p>
                 ) : pedido.status === 'ENTREGADO' ? (
                   <p className="text-xs text-gray-400 inline-flex items-center gap-1">
-                    <CheckCircle2 size={14} className="text-green-500" />
+                    <CheckCircle2 size={14} className="text-sage" />
                     Entregado el {formatDateTime(pedido.deliveredAt)}
                   </p>
                 ) : canAdvance ? (

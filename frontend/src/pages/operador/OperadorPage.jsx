@@ -5,7 +5,8 @@ import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidos, getPedidoById, updatePedidoStatus } from '../../services/pedidos.service'
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
+import { ORDER_STATUS_LABELS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
+import EstadoBadge from '../../components/ui/EstadoBadge'
 
 const PAGE_SIZE = 10
 // Estados sobre los que el operador puede seguir trabajando: cualquier estado
@@ -210,13 +211,7 @@ function OperadorPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span
-                              className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
-                                pedido.cancelledAt ? 'bg-red-50 text-red-600' : ORDER_STATUS_COLORS[pedido.status]
-                              }`}
-                            >
-                              {pedido.cancelledAt ? 'Cancelado' : ORDER_STATUS_LABELS[pedido.status]}
-                            </span>
+                            <EstadoBadge status={pedido.cancelledAt ? 'CANCELADO' : pedido.status} />
                           </td>
                           <td className="px-6 py-4">
                             <button
