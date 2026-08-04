@@ -92,43 +92,44 @@ function DashboardPage() {
     loadKpis()
   }, [loadKpis])
 
+  const TONE_CLASSES = {
+    detergent: 'bg-detergent/10 text-detergent',
+    tag: 'bg-tag/10 text-tag',
+    sage: 'bg-sage/10 text-sage',
+  }
+
   const cards = kpis && [
     {
       label: 'Pedidos de hoy',
       value: kpis.pedidosHoy,
-      icon: <ClipboardList size={28} className="text-blue-500" />,
-      iconBg: 'bg-blue-50',
-      border: 'border-blue-100',
+      icon: ClipboardList,
+      tone: 'detergent',
     },
     {
       label: 'Entregados hoy',
       value: kpis.entregadosHoy,
-      icon: <CheckCircle2 size={28} className="text-green-500" />,
-      iconBg: 'bg-green-50',
-      border: 'border-green-100',
+      icon: CheckCircle2,
+      tone: 'sage',
     },
     {
       label: 'Pendientes de entrega',
       value: kpis.listosPendientes,
-      icon: <Clock size={28} className="text-amber-500" />,
-      iconBg: 'bg-amber-50',
-      border: 'border-amber-100',
+      icon: Clock,
+      tone: 'tag',
     },
     ...(canSeeFinancials
       ? [
           {
             label: 'Ingreso del día',
             value: formatCurrency(kpis.ingresoDia),
-            icon: <Wallet size={28} className="text-indigo-500" />,
-            iconBg: 'bg-indigo-50',
-            border: 'border-indigo-100',
+            icon: Wallet,
+            tone: 'detergent',
           },
           {
             label: 'Ingreso de la semana',
             value: formatCurrency(kpis.ingresoSemana),
-            icon: <TrendingUp size={28} className="text-purple-500" />,
-            iconBg: 'bg-purple-50',
-            border: 'border-purple-100',
+            icon: TrendingUp,
+            tone: 'detergent',
           },
         ]
       : []),
@@ -138,7 +139,7 @@ function DashboardPage() {
     <MainLayout navLinks={getNavLinks(user?.role)} userName={user?.fullName} userRole={user?.role} onLogout={handleLogout}>
       <div className="flex h-full flex-col gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Bienvenido, {user?.fullName}</h1>
+          <h1 className="text-2xl font-bold text-ink">Bienvenido, {user?.fullName}</h1>
           <p className="text-sm text-gray-400 mt-0.5 capitalize">{today}</p>
         </div>
 
@@ -156,18 +157,23 @@ function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 flex-1 auto-rows-fr">
-            {cards.map((card) => (
-              <div
-                key={card.label}
-                className={`bg-white rounded-2xl p-6 shadow-sm border ${card.border} flex flex-col justify-between`}
-              >
-                <div className={`${card.iconBg} p-3 rounded-xl w-fit`}>{card.icon}</div>
-                <div>
-                  <p className="text-3xl font-extrabold text-gray-800 mt-3">{card.value}</p>
-                  <p className="text-sm text-gray-500 mt-1 leading-tight">{card.label}</p>
+            {cards.map((card) => {
+              const Icon = card.icon
+              return (
+                <div
+                  key={card.label}
+                  className="ticket-edge bg-surface rounded-2xl p-5 shadow-sm border border-black/5 flex items-center gap-4"
+                >
+                  <div className={`shrink-0 p-3 rounded-xl ${TONE_CLASSES[card.tone]}`}>
+                    <Icon size={26} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-mono text-4xl font-bold text-ink leading-none">{card.value}</p>
+                    <p className="text-sm text-gray-500 mt-1.5 leading-tight">{card.label}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
