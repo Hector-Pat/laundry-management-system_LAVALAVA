@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Loader2, AlertCircle, ChevronLeft, ChevronRight, User } from 'lucide-react'
+import { ArrowLeft, Loader2, AlertCircle, ChevronLeft, ChevronRight, User, PackageOpen } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
@@ -8,6 +8,7 @@ import { getClienteById } from '../../services/clientes.service'
 import { getPedidos } from '../../services/pedidos.service'
 import { getPagos } from '../../services/pagos.service'
 import EstadoBadge from '../../components/ui/EstadoBadge'
+import EmptyState from '../../components/ui/EmptyState'
 
 const PAGE_SIZE = 10
 
@@ -143,9 +144,11 @@ function ClienteDetailPage() {
                   <p className="text-sm font-medium">Cargando pedidos...</p>
                 </div>
               ) : pedidos.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center text-gray-400">
-                  <p className="text-sm font-medium">Este cliente no tiene pedidos registrados</p>
-                </div>
+                <EmptyState
+                  icon={PackageOpen}
+                  title="Este cliente no tiene pedidos registrados"
+                  description="Cuando genere su primer pedido, aparecerá aquí."
+                />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">

@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Loader2, Plus, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { Loader2, Plus, ChevronLeft, ChevronRight, AlertCircle, PackageSearch } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidos } from '../../services/pedidos.service'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_VALUES } from '../../constants/orderStatus'
 import EstadoBadge from '../../components/ui/EstadoBadge'
+import EmptyState from '../../components/ui/EmptyState'
 
 const PAGE_SIZE = 10
 
@@ -177,9 +178,11 @@ function PedidosPage() {
               <p className="text-sm font-medium">Cargando pedidos...</p>
             </div>
           ) : pedidos.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <p className="text-sm font-medium">No hay pedidos que coincidan con los filtros</p>
-            </div>
+            <EmptyState
+              icon={PackageSearch}
+              title="No hay pedidos que coincidan con los filtros"
+              description="Ajusta los filtros o registra un pedido nuevo desde el botón de arriba."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">

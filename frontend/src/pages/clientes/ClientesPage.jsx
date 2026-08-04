@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Loader2, Plus, ChevronLeft, ChevronRight, AlertCircle, Pencil, X } from 'lucide-react'
+import { Loader2, Plus, ChevronLeft, ChevronRight, AlertCircle, Pencil, X, UserSearch } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getClientes, createCliente, updateCliente } from '../../services/clientes.service'
+import EmptyState from '../../components/ui/EmptyState'
 
 const PAGE_SIZE = 10
 
@@ -233,9 +234,11 @@ function ClientesPage() {
               <p className="text-sm font-medium">Cargando clientes...</p>
             </div>
           ) : clientes.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <p className="text-sm font-medium">No hay clientes que coincidan con la búsqueda</p>
-            </div>
+            <EmptyState
+              icon={UserSearch}
+              title="No hay clientes que coincidan con la búsqueda"
+              description="Prueba con otro nombre o teléfono, o registra uno nuevo."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">

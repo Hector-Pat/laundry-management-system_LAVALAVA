@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, ShieldCheck, ShieldOff, AlertCircle, Plus, X, KeyRound } from 'lucide-react'
+import { Loader2, ShieldCheck, ShieldOff, AlertCircle, Plus, X, KeyRound, Users } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getUsers, createUser, updateUser } from '../../services/users.service'
+import EmptyState from '../../components/ui/EmptyState'
 
 const ROLE_LABELS = {
   ADMIN: 'Administrador',
@@ -305,9 +306,11 @@ function AdminPage() {
               <p className="text-sm font-medium">Cargando usuarios...</p>
             </div>
           ) : users.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <p className="text-sm font-medium">No hay usuarios para mostrar</p>
-            </div>
+            <EmptyState
+              icon={Users}
+              title="No hay usuarios para mostrar"
+              description="Crea el primer usuario del sistema desde el botón de arriba."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">

@@ -1,12 +1,13 @@
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, AlertCircle, ArrowRight } from 'lucide-react'
+import { Loader2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, AlertCircle, ArrowRight, PackageSearch } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidos, getPedidoById, updatePedidoStatus } from '../../services/pedidos.service'
 import { ORDER_STATUS_LABELS, ORDER_TRANSITIONS } from '../../constants/orderStatus'
 import EstadoBadge from '../../components/ui/EstadoBadge'
+import EmptyState from '../../components/ui/EmptyState'
 
 const PAGE_SIZE = 10
 // Estados sobre los que el operador puede seguir trabajando: cualquier estado
@@ -178,9 +179,11 @@ function OperadorPage() {
               <p className="text-sm font-medium">Cargando pedidos...</p>
             </div>
           ) : pedidos.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <p className="text-sm font-medium">No hay pedidos que coincidan con los filtros</p>
-            </div>
+            <EmptyState
+              icon={PackageSearch}
+              title="No hay pedidos que coincidan con los filtros"
+              description="Cambia el filtro de estado para ver más pedidos."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">

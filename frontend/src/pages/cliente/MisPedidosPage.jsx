@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { Loader2, ChevronLeft, ChevronRight, AlertCircle, PackageSearch } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getMisPedidos } from '../../services/pedidos.service'
 import EstadoBadge from '../../components/ui/EstadoBadge'
+import EmptyState from '../../components/ui/EmptyState'
 
 const PAGE_SIZE = 10
 
@@ -84,13 +85,11 @@ function MisPedidosPage() {
               <p className="text-sm font-medium">Cargando pedidos...</p>
             </div>
           ) : pedidos.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-gray-400 text-center px-6">
-              <p className="text-sm font-medium">No encontramos pedidos asociados a tu cuenta</p>
-              <p className="text-xs text-gray-400 max-w-sm">
-                Si dejaste tu pedido en mostrador con un correo o teléfono distinto al de tu cuenta, pídele al
-                personal que lo verifique.
-              </p>
-            </div>
+            <EmptyState
+              icon={PackageSearch}
+              title="No encontramos pedidos asociados a tu cuenta"
+              description="Si dejaste tu pedido en mostrador con un correo o teléfono distinto al de tu cuenta, pídele al personal que lo verifique."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Printer, Receipt, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert, Pencil } from 'lucide-react'
+import { ArrowLeft, Printer, Receipt, Loader2, AlertCircle, CheckCircle2, Plus, X, ShieldAlert, ShieldCheck, Pencil } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
@@ -427,7 +427,10 @@ function PedidoDetailPage() {
                     <Loader2 size={16} className="animate-spin" /> Cargando reclamaciones...
                   </div>
                 ) : reclamaciones.length === 0 ? (
-                  <p className="text-sm text-gray-400">No hay daños ni reclamaciones registrados.</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2">
+                    <ShieldCheck size={16} className="text-ink/20" />
+                    No hay daños ni reclamaciones registrados.
+                  </p>
                 ) : (
                   <div className="border border-gray-100 rounded-xl divide-y divide-gray-100">
                     {reclamaciones.map((reclamacion) => (

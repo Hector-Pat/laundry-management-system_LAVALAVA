@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { Loader2, ChevronLeft, ChevronRight, AlertCircle, ScrollText } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getAuditLog } from '../../services/auditoria.service'
+import EmptyState from '../../components/ui/EmptyState'
 
 const PAGE_SIZE = 20
 
@@ -96,9 +97,11 @@ function AuditoriaPage() {
               <p className="text-sm font-medium">Cargando bitácora...</p>
             </div>
           ) : entries.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <p className="text-sm font-medium">No hay acciones registradas todavía</p>
-            </div>
+            <EmptyState
+              icon={ScrollText}
+              title="No hay acciones registradas todavía"
+              description="Las acciones del sistema aparecerán aquí conforme ocurran."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">

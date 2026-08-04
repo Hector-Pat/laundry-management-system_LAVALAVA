@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Loader2, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { Loader2, ChevronLeft, ChevronRight, AlertCircle, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getAllReclamaciones } from '../../services/reclamaciones.service'
+import EmptyState from '../../components/ui/EmptyState'
 
 const PAGE_SIZE = 10
 
@@ -99,9 +100,11 @@ function ReclamacionesPage() {
               <p className="text-sm font-medium">Cargando reclamaciones...</p>
             </div>
           ) : reclamaciones.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <p className="text-sm font-medium">No hay reclamaciones que coincidan con el filtro</p>
-            </div>
+            <EmptyState
+              icon={ShieldCheck}
+              title="No hay reclamaciones que coincidan con el filtro"
+              description="Cambia el filtro para ver reclamaciones abiertas o resueltas."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
