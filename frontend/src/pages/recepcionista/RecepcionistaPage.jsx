@@ -15,6 +15,9 @@ import MainLayout from '../../components/layout/MainLayout'
 import { getNavLinks } from '../../components/layout/navLinks'
 import { getPedidos } from '../../services/pedidos.service'
 import { getPagos } from '../../services/pagos.service'
+import { ORDER_STATUS_VALUES } from '../../constants/orderStatus'
+
+const OTHER_ACTIVE_STATUSES = ORDER_STATUS_VALUES.filter((status) => status !== 'ENTREGADO' && status !== 'LISTO')
 
 const QUICK_LINKS = [
   { label: 'Ver Pedidos', path: '/pedidos',  icon: <Package size={26} />, color: 'text-detergent bg-detergent/10 hover:bg-detergent/15 border-detergent/20' },
@@ -54,13 +57,16 @@ function RecepcionistaPage() {
   const loadStats = useCallback(async () => {
     setIsLoadingStats(true)
     try {
-      const [hoyResult, listosResult] = await Promise.all([
+      const [hoyResult, listosResult, ...otrosActivosResults] = await Promise.all([
         getPedidos({ date: todayISODate(), pageSize: 1 }),
         getPedidos({ status: 'LISTO', pageSize: 100 }),
+        ...OTHER_ACTIVE_STATUSES.map((status) => getPedidos({ status, pageSize: 100 })),
       ])
 
       const listos = listosResult.data.filter((pedido) => !pedido.cancelledAt)
-      const saldos = await Promise.all(listos.map((pedido) => getPagos(pedido.id)))
+      const otrosActivos = otrosActivosResults.flatMap((result) => result.data)
+      const activos = [...listos, ...otrosActivos].filter((pedido) => !pedido.cancelledAt)
+      const saldos = await Promise.all(activos.map((pedido) => getPagos(pedido.id)))
       const saldoPendiente = saldos.reduce((acc, saldo) => acc + Number(saldo.saldoPendiente), 0)
 
       setStats({
