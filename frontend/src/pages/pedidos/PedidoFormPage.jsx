@@ -230,7 +230,7 @@ function PedidoFormPage() {
     >
       <form onSubmit={handleSubmit} className="flex flex-col h-full gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-ink">
             {isEditMode ? `Editar pedido ${editablePedido?.folio ?? ''}` : 'Nuevo pedido'}
           </h1>
           <p className="text-sm text-gray-400 mt-0.5">
@@ -251,9 +251,9 @@ function PedidoFormPage() {
           {/* Cliente */}
           {isEditMode ? (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-              <h2 className="font-semibold text-gray-800">Cliente</h2>
+              <h2 className="font-semibold text-ink">Cliente</h2>
               <div className="bg-gray-50 rounded-xl px-4 py-3">
-                <p className="font-semibold text-gray-800">{editablePedido?.cliente.fullName}</p>
+                <p className="font-semibold text-ink">{editablePedido?.cliente.fullName}</p>
                 <p className="text-xs text-gray-500">{editablePedido?.cliente.phoneNumber}</p>
               </div>
               <p className="text-xs text-gray-400">
@@ -263,7 +263,7 @@ function PedidoFormPage() {
           ) : (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-800">Cliente</h2>
+              <h2 className="font-semibold text-ink">Cliente</h2>
               <button
                 type="button"
                 onClick={() => {
@@ -272,7 +272,7 @@ function PedidoFormPage() {
                   setSearchTerm('')
                   setSearchResults([])
                 }}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1"
+                className="text-xs font-semibold text-detergent hover:text-detergent-hover inline-flex items-center gap-1"
               >
                 <UserPlus size={14} />
                 {clienteMode === 'search' ? 'Registrar cliente nuevo' : 'Buscar cliente existente'}
@@ -281,9 +281,9 @@ function PedidoFormPage() {
 
             {clienteMode === 'search' ? (
               selectedCliente ? (
-                <div className="flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3">
+                <div className="flex items-center justify-between bg-detergent/10 border border-detergent/20 rounded-xl px-4 py-3">
                   <div>
-                    <p className="font-semibold text-gray-800">{selectedCliente.fullName}</p>
+                    <p className="font-semibold text-ink">{selectedCliente.fullName}</p>
                     <p className="text-xs text-gray-500">{selectedCliente.phoneNumber}</p>
                   </div>
                   <button
@@ -304,7 +304,7 @@ function PedidoFormPage() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar por nombre, teléfono o correo..."
-                      className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                     />
                   </div>
 
@@ -323,7 +323,7 @@ function PedidoFormPage() {
                           onClick={() => setSelectedCliente(cliente)}
                           className="w-full text-left px-4 py-2.5 hover:bg-gray-50"
                         >
-                          <p className="text-sm font-medium text-gray-800">{cliente.fullName}</p>
+                          <p className="text-sm font-medium text-ink">{cliente.fullName}</p>
                           <p className="text-xs text-gray-400">{cliente.phoneNumber}</p>
                         </button>
                       ))}
@@ -344,7 +344,7 @@ function PedidoFormPage() {
                     value={newCliente.fullName}
                     onChange={(e) => setNewCliente((prev) => ({ ...prev, fullName: e.target.value }))}
                     placeholder="Ej. María González"
-                    className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                   />
                 </div>
                 <div>
@@ -354,7 +354,7 @@ function PedidoFormPage() {
                     value={newCliente.phoneNumber}
                     onChange={(e) => setNewCliente((prev) => ({ ...prev, phoneNumber: e.target.value }))}
                     placeholder="5512345678"
-                    className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                   />
                 </div>
                 <div>
@@ -364,7 +364,7 @@ function PedidoFormPage() {
                     value={newCliente.email}
                     onChange={(e) => setNewCliente((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="correo@ejemplo.com"
-                    className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                   />
                 </div>
               </div>
@@ -374,7 +374,7 @@ function PedidoFormPage() {
 
           {/* Servicios */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3 min-h-0">
-            <h2 className="font-semibold text-gray-800">Servicios</h2>
+            <h2 className="font-semibold text-ink">Servicios</h2>
 
             {isLoadingServicios ? (
               <div className="flex-1 flex items-center justify-center text-gray-400 gap-2">
@@ -390,7 +390,7 @@ function PedidoFormPage() {
                     <div
                       key={servicio.id}
                       className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-colors ${
-                        isChecked ? 'border-indigo-200 bg-indigo-50/50' : 'border-gray-100'
+                        isChecked ? 'border-detergent/30 bg-detergent/10' : 'border-gray-100'
                       }`}
                     >
                       <label className="flex items-center gap-3 flex-1 cursor-pointer">
@@ -398,10 +398,10 @@ function PedidoFormPage() {
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => toggleServicio(servicio.id)}
-                          className="h-4 w-4 accent-indigo-600"
+                          className="h-4 w-4 accent-detergent"
                         />
                         <div>
-                          <p className="text-sm font-medium text-gray-800">{servicio.name}</p>
+                          <p className="text-sm font-medium text-ink">{servicio.name}</p>
                           <p className="text-xs text-gray-400">{formatCurrency(servicio.price)} c/u</p>
                         </div>
                       </label>
@@ -437,12 +437,12 @@ function PedidoFormPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</p>
-            <p className="text-3xl font-extrabold text-gray-800">{formatCurrency(total)}</p>
+            <p className="text-3xl font-extrabold text-ink">{formatCurrency(total)}</p>
           </div>
           <button
             type="submit"
             disabled={!canSubmit || isSubmitting}
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-xl transition-colors"
           >
             {isSubmitting && <Loader2 size={18} className="animate-spin" />}
             {isEditMode

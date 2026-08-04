@@ -10,7 +10,7 @@ function PasswordInput({ label, error, ...props }) {
       <div className="relative">
         <input
           type={show ? 'text' : 'password'}
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-detergent"
           {...props}
         />
         <button

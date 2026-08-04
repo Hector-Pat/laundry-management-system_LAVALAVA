@@ -134,7 +134,7 @@ function CajaPage() {
       <div className="flex flex-col h-full gap-5">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Corte de caja</h1>
+            <h1 className="text-2xl font-bold text-ink">Corte de caja</h1>
             <p className="text-sm text-gray-400 mt-0.5">Ingresos, egresos y total del día (RF-08)</p>
           </div>
 
@@ -144,7 +144,7 @@ function CajaPage() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
         </div>
@@ -165,12 +165,12 @@ function CajaPage() {
           <div className="flex flex-col gap-5">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-3">
-                <div className="bg-green-50 text-green-600 rounded-xl p-2.5">
+                <div className="bg-green-50 text-sage rounded-xl p-2.5">
                   <TrendingUp size={20} />
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Ingresos</p>
-                  <p className="text-xl font-extrabold text-gray-800">{formatCurrency(corte.ingresos)}</p>
+                  <p className="text-xl font-extrabold text-ink">{formatCurrency(corte.ingresos)}</p>
                 </div>
               </div>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-3">
@@ -179,16 +179,16 @@ function CajaPage() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Egresos</p>
-                  <p className="text-xl font-extrabold text-gray-800">{formatCurrency(corte.egresos)}</p>
+                  <p className="text-xl font-extrabold text-ink">{formatCurrency(corte.egresos)}</p>
                 </div>
               </div>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-3">
-                <div className="bg-indigo-50 text-indigo-600 rounded-xl p-2.5">
+                <div className="bg-detergent/10 text-detergent rounded-xl p-2.5">
                   <Wallet size={20} />
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total en caja</p>
-                  <p className="text-xl font-extrabold text-gray-800">{formatCurrency(corte.total)}</p>
+                  <p className="text-xl font-extrabold text-ink">{formatCurrency(corte.total)}</p>
                 </div>
               </div>
             </div>
@@ -196,7 +196,7 @@ function CajaPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="px-6 py-3 border-b border-gray-100">
-                  <h2 className="font-semibold text-gray-800">Pagos cobrados</h2>
+                  <h2 className="font-semibold text-ink">Pagos cobrados</h2>
                 </div>
                 {corte.pagos.length === 0 ? (
                   <p className="text-sm text-gray-400 px-6 py-6 text-center">Sin pagos registrados</p>
@@ -205,12 +205,12 @@ function CajaPage() {
                     {corte.pagos.map((pago) => (
                       <div key={pago.id} className="flex items-center justify-between px-6 py-3 text-sm">
                         <div>
-                          <p className="font-semibold text-gray-800">{pago.pedidoFolio}</p>
+                          <p className="font-semibold text-ink">{pago.pedidoFolio}</p>
                           <p className="text-xs text-gray-400">
                             {PAYMENT_TYPE_LABELS[pago.type]} · {PAYMENT_METHOD_LABELS[pago.method]} · {formatTime(pago.createdAt)}
                           </p>
                         </div>
-                        <span className="font-semibold text-green-600">{formatCurrency(pago.amount)}</span>
+                        <span className="font-semibold text-sage">{formatCurrency(pago.amount)}</span>
                       </div>
                     ))}
                   </div>
@@ -219,7 +219,7 @@ function CajaPage() {
 
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
                 <div className="px-6 py-3 border-b border-gray-100">
-                  <h2 className="font-semibold text-gray-800">Egresos</h2>
+                  <h2 className="font-semibold text-ink">Egresos</h2>
                 </div>
 
                 {corte.gastos.length === 0 ? (
@@ -229,7 +229,7 @@ function CajaPage() {
                     {corte.gastos.map((item) => (
                       <div key={item.id} className="flex items-center justify-between px-6 py-3 text-sm">
                         <div>
-                          <p className="font-semibold text-gray-800">{item.concept}</p>
+                          <p className="font-semibold text-ink">{item.concept}</p>
                           <p className="text-xs text-gray-400">{formatTime(item.createdAt)}</p>
                         </div>
                         <span className="font-semibold text-red-600">-{formatCurrency(item.amount)}</span>
@@ -251,7 +251,7 @@ function CajaPage() {
                       value={gasto.concept}
                       onChange={(e) => setGasto((prev) => ({ ...prev, concept: e.target.value }))}
                       placeholder="Concepto del gasto"
-                      className="flex-1 min-w-[140px] rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex-1 min-w-[140px] rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                     />
                     <input
                       type="number"
@@ -260,7 +260,7 @@ function CajaPage() {
                       value={gasto.amount}
                       onChange={(e) => setGasto((prev) => ({ ...prev, amount: e.target.value }))}
                       placeholder="Monto"
-                      className="w-28 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-28 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
                     />
                     <button
                       type="submit"
@@ -280,7 +280,7 @@ function CajaPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <h2 className="font-semibold text-gray-800">Reporte por rango de fechas</h2>
+              <h2 className="font-semibold text-ink">Reporte por rango de fechas</h2>
               <p className="text-xs text-gray-400 mt-0.5">Ingresos y egresos agrupados por día</p>
             </div>
             <div className="flex items-end gap-3 flex-wrap">
@@ -291,7 +291,7 @@ function CajaPage() {
                   value={reporteDesde}
                   max={reporteHasta}
                   onChange={(e) => setReporteDesde(e.target.value)}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -302,7 +302,7 @@ function CajaPage() {
                   min={reporteDesde}
                   max={todayISODate()}
                   onChange={(e) => setReporteHasta(e.target.value)}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
                 />
               </div>
               <button
@@ -344,22 +344,22 @@ function CajaPage() {
                   {reporte.dias.map((dia) => (
                     <tr key={dia.date}>
                       <td className="px-4 py-2 text-gray-700">{dia.date}</td>
-                      <td className="px-4 py-2 text-green-600 font-medium">{formatCurrency(dia.ingresos)}</td>
+                      <td className="px-4 py-2 text-sage font-medium">{formatCurrency(dia.ingresos)}</td>
                       <td className="px-4 py-2 text-red-600 font-medium">{formatCurrency(dia.egresos)}</td>
-                      <td className="px-4 py-2 font-semibold text-gray-800">{formatCurrency(dia.total)}</td>
+                      <td className="px-4 py-2 font-semibold text-ink">{formatCurrency(dia.total)}</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
                   <tr className="bg-gray-50">
                     <td className="px-4 py-2 font-semibold text-gray-600">Total</td>
-                    <td className="px-4 py-2 font-semibold text-green-600">
+                    <td className="px-4 py-2 font-semibold text-sage">
                       {formatCurrency(reporte.totales.ingresos)}
                     </td>
                     <td className="px-4 py-2 font-semibold text-red-600">
                       {formatCurrency(reporte.totales.egresos)}
                     </td>
-                    <td className="px-4 py-2 font-extrabold text-gray-800">
+                    <td className="px-4 py-2 font-extrabold text-ink">
                       {formatCurrency(reporte.totales.total)}
                     </td>
                   </tr>

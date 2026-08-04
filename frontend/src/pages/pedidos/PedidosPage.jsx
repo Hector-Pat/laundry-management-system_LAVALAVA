@@ -89,13 +89,13 @@ function PedidosPage() {
       <div className="flex flex-col h-full gap-5">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Pedidos</h1>
+            <h1 className="text-2xl font-bold text-ink">Pedidos</h1>
             <p className="text-sm text-gray-400 mt-0.5">Seguimiento de todos los pedidos de la lavandería</p>
           </div>
           {canCreate && (
             <Link
               to="/pedidos/nuevo"
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
             >
               <Plus size={18} />
               Nuevo pedido
@@ -112,7 +112,7 @@ function PedidosPage() {
                 setStatus(e.target.value)
                 setPage(1)
               }}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
             >
               <option value="">Todos</option>
               {ORDER_STATUS_VALUES.map((value) => (
@@ -132,7 +132,7 @@ function PedidosPage() {
                 setDate(e.target.value)
                 setPage(1)
               }}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -143,7 +143,7 @@ function PedidosPage() {
               value={clienteInput}
               onChange={(e) => setClienteInput(e.target.value)}
               placeholder="Buscar cliente..."
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -196,22 +196,22 @@ function PedidosPage() {
                 <tbody className="divide-y divide-gray-100">
                   {pedidos.map((pedido) => (
                     <tr key={pedido.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-gray-800">{pedido.folio}</td>
+                      <td className="px-6 py-4 font-semibold text-ink">{pedido.folio}</td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
-                          <span className="font-medium text-gray-800">{pedido.cliente.fullName}</span>
+                          <span className="font-medium text-ink">{pedido.cliente.fullName}</span>
                           <span className="text-xs text-gray-400">{pedido.cliente.phoneNumber}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <EstadoBadge status={pedido.cancelledAt ? 'CANCELADO' : pedido.status} />
                       </td>
-                      <td className="px-6 py-4 font-semibold text-gray-800">{formatCurrency(pedido.total)}</td>
+                      <td className="px-6 py-4 font-semibold text-ink">{formatCurrency(pedido.total)}</td>
                       <td className="px-6 py-4 text-gray-500">{formatDateTime(pedido.createdAt)}</td>
                       <td className="px-6 py-4 text-right">
                         <Link
                           to={`/pedidos/${pedido.id}`}
-                          className="text-indigo-600 hover:text-indigo-800 font-semibold text-sm"
+                          className="text-detergent hover:text-detergent-hover font-semibold text-sm"
                         >
                           Ver detalle
                         </Link>

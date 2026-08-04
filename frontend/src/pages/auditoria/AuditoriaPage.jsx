@@ -78,7 +78,7 @@ function AuditoriaPage() {
     >
       <div className="flex flex-col h-full gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Bitácora de auditoría</h1>
+          <h1 className="text-2xl font-bold text-ink">Bitácora de auditoría</h1>
           <p className="text-sm text-gray-400 mt-0.5">Acciones sensibles registradas en el sistema</p>
         </div>
 
@@ -115,9 +115,9 @@ function AuditoriaPage() {
                   {entries.map((entry) => (
                     <tr key={entry.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDateTime(entry.createdAt)}</td>
-                      <td className="px-6 py-4 font-medium text-gray-800">{entry.userFullName || '—'}</td>
+                      <td className="px-6 py-4 font-medium text-ink">{entry.userFullName || '—'}</td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600">
+                        <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-detergent/10 text-detergent">
                           {ACTION_LABELS[entry.action] || entry.action}
                         </span>
                       </td>

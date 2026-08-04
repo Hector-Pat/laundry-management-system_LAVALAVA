@@ -46,7 +46,7 @@ function ClienteModal({ cliente, onClose, onSaved }) {
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">{isEdit ? 'Editar cliente' : 'Nuevo cliente'}</h2>
+          <h2 className="font-semibold text-ink text-lg">{isEdit ? 'Editar cliente' : 'Nuevo cliente'}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
@@ -67,7 +67,7 @@ function ClienteModal({ cliente, onClose, onSaved }) {
               autoFocus
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -77,7 +77,7 @@ function ClienteModal({ cliente, onClose, onSaved }) {
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -87,7 +87,7 @@ function ClienteModal({ cliente, onClose, onSaved }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -95,14 +95,14 @@ function ClienteModal({ cliente, onClose, onSaved }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+              className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Guardar
@@ -181,12 +181,12 @@ function ClientesPage() {
       <div className="flex flex-col h-full gap-5">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Clientes</h1>
+            <h1 className="text-2xl font-bold text-ink">Clientes</h1>
             <p className="text-sm text-gray-400 mt-0.5">Directorio de clientes de mostrador</p>
           </div>
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
           >
             <Plus size={16} />
             Nuevo cliente
@@ -201,7 +201,7 @@ function ClientesPage() {
               value={clienteInput}
               onChange={(e) => setClienteInput(e.target.value)}
               placeholder="Buscar cliente..."
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -251,8 +251,8 @@ function ClientesPage() {
                 <tbody className="divide-y divide-gray-100">
                   {clientes.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-800">
-                        <Link to={`/clientes/${item.id}`} className="text-indigo-600 hover:text-indigo-800">
+                      <td className="px-6 py-4 font-medium text-ink">
+                        <Link to={`/clientes/${item.id}`} className="text-detergent hover:text-detergent-hover">
                           {item.fullName}
                         </Link>
                       </td>

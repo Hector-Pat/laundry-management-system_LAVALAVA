@@ -139,7 +139,7 @@ function OperadorPage() {
     >
       <div className="flex flex-col h-full gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Bienvenido, {user?.fullName}</h1>
+          <h1 className="text-2xl font-bold text-ink">Bienvenido, {user?.fullName}</h1>
           <p className="text-sm text-gray-400 mt-0.5 capitalize">{today}</p>
         </div>
 
@@ -152,7 +152,7 @@ function OperadorPage() {
                 setStatusFilter(e.target.value)
                 setPage(1)
               }}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
             >
               <option value="">Activos</option>
               {Object.keys(ORDER_STATUS_LABELS).map((value) => (
@@ -203,10 +203,10 @@ function OperadorPage() {
                     return (
                       <Fragment key={pedido.id}>
                         <tr className="hover:bg-gray-50">
-                          <td className="px-6 py-4 font-semibold text-gray-800">{pedido.folio}</td>
+                          <td className="px-6 py-4 font-semibold text-ink">{pedido.folio}</td>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
-                              <span className="font-medium text-gray-800">{pedido.cliente.fullName}</span>
+                              <span className="font-medium text-ink">{pedido.cliente.fullName}</span>
                               <span className="text-xs text-gray-400">{pedido.cliente.phoneNumber}</span>
                             </div>
                           </td>
@@ -227,7 +227,7 @@ function OperadorPage() {
                               <button
                                 onClick={() => handleAdvance(pedido)}
                                 disabled={advancingId === pedido.id}
-                                className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors text-xs"
+                                className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors text-xs"
                               >
                                 {advancingId === pedido.id ? (
                                   <Loader2 size={12} className="animate-spin" />

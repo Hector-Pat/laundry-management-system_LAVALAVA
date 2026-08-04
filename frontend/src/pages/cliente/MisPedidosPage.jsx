@@ -66,7 +66,7 @@ function MisPedidosPage() {
     >
       <div className="flex flex-col h-full gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Mis pedidos</h1>
+          <h1 className="text-2xl font-bold text-ink">Mis pedidos</h1>
           <p className="text-sm text-gray-400 mt-0.5">Seguimiento de tus pedidos en LavaLava</p>
         </div>
 
@@ -105,11 +105,11 @@ function MisPedidosPage() {
                 <tbody className="divide-y divide-gray-100">
                   {pedidos.map((pedido) => (
                     <tr key={pedido.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-gray-800">{pedido.folio}</td>
+                      <td className="px-6 py-4 font-semibold text-ink">{pedido.folio}</td>
                       <td className="px-6 py-4">
                         <EstadoBadge status={pedido.cancelledAt ? 'CANCELADO' : pedido.status} />
                       </td>
-                      <td className="px-6 py-4 font-semibold text-gray-800">{formatCurrency(pedido.total)}</td>
+                      <td className="px-6 py-4 font-semibold text-ink">{formatCurrency(pedido.total)}</td>
                       <td className="px-6 py-4 text-gray-500">{formatDateTime(pedido.createdAt)}</td>
                     </tr>
                   ))}

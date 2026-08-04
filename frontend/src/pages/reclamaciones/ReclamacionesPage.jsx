@@ -63,7 +63,7 @@ function ReclamacionesPage() {
     >
       <div className="flex flex-col h-full gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Daños y reclamaciones</h1>
+          <h1 className="text-2xl font-bold text-ink">Daños y reclamaciones</h1>
           <p className="text-sm text-gray-400 mt-0.5">Seguimiento de reclamaciones de todos los pedidos</p>
         </div>
 
@@ -76,7 +76,7 @@ function ReclamacionesPage() {
                 setStatus(e.target.value)
                 setPage(1)
               }}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-detergent"
             >
               <option value="">Todas</option>
               <option value="ABIERTA">Abiertas</option>
@@ -118,10 +118,10 @@ function ReclamacionesPage() {
                 <tbody className="divide-y divide-gray-100">
                   {reclamaciones.map((reclamacion) => (
                     <tr key={reclamacion.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-gray-800">{reclamacion.pedidoFolio}</td>
+                      <td className="px-6 py-4 font-semibold text-ink">{reclamacion.pedidoFolio}</td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
-                          <span className="font-medium text-gray-800">{reclamacion.cliente.fullName}</span>
+                          <span className="font-medium text-ink">{reclamacion.cliente.fullName}</span>
                           <span className="text-xs text-gray-400">{reclamacion.cliente.phoneNumber}</span>
                         </div>
                       </td>
@@ -130,7 +130,7 @@ function ReclamacionesPage() {
                         <span
                           className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
                             reclamacion.status === 'RESUELTA'
-                              ? 'bg-green-50 text-green-600'
+                              ? 'bg-green-50 text-sage'
                               : 'bg-amber-50 text-amber-600'
                           }`}
                         >
@@ -141,7 +141,7 @@ function ReclamacionesPage() {
                       <td className="px-6 py-4 text-right">
                         <Link
                           to={`/pedidos/${reclamacion.pedidoId}`}
-                          className="text-indigo-600 hover:text-indigo-800 font-semibold text-sm"
+                          className="text-detergent hover:text-detergent-hover font-semibold text-sm"
                         >
                           Ver pedido
                         </Link>

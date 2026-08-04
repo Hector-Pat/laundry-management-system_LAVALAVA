@@ -120,11 +120,11 @@ function ClienteDetailPage() {
         ) : (
           <>
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-              <div className="bg-indigo-50 p-3 rounded-2xl text-indigo-600 shrink-0">
+              <div className="bg-detergent/10 p-3 rounded-2xl text-detergent shrink-0">
                 <User size={28} />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">{cliente.fullName}</h1>
+                <h1 className="text-xl font-bold text-ink">{cliente.fullName}</h1>
                 <p className="text-sm text-gray-500">
                   {cliente.phoneNumber} {cliente.email ? `· ${cliente.email}` : ''}
                 </p>
@@ -132,7 +132,7 @@ function ClienteDetailPage() {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-gray-800">Historial de pedidos</h2>
+              <h2 className="text-lg font-bold text-ink">Historial de pedidos</h2>
               <p className="text-sm text-gray-400 mt-0.5">Del más reciente al más antiguo</p>
             </div>
 
@@ -161,8 +161,8 @@ function ClienteDetailPage() {
                     <tbody className="divide-y divide-gray-100">
                       {pedidos.map((pedido) => (
                         <tr key={pedido.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 font-semibold text-gray-800">
-                            <Link to={`/pedidos/${pedido.id}`} className="text-indigo-600 hover:text-indigo-800">
+                          <td className="px-6 py-4 font-semibold text-ink">
+                            <Link to={`/pedidos/${pedido.id}`} className="text-detergent hover:text-detergent-hover">
                               {pedido.folio}
                             </Link>
                           </td>
@@ -170,7 +170,7 @@ function ClienteDetailPage() {
                           <td className="px-6 py-4">
                             <EstadoBadge status={pedido.cancelledAt ? 'CANCELADO' : pedido.status} />
                           </td>
-                          <td className="px-6 py-4 font-semibold text-gray-800">{formatCurrency(pedido.total)}</td>
+                          <td className="px-6 py-4 font-semibold text-ink">{formatCurrency(pedido.total)}</td>
                           <td className="px-6 py-4 text-gray-500">
                             {saldosById[pedido.id] != null ? formatCurrency(saldosById[pedido.id]) : '—'}
                           </td>

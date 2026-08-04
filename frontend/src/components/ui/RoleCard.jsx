@@ -11,8 +11,8 @@ function RoleCard({ role, label, icon, description, selected, onSelect }) {
       onClick={() => onSelect(role)}
       className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-colors w-full cursor-pointer
         ${selected
-          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-          : 'border-gray-200 bg-white text-gray-700 hover:border-indigo-300'
+          ? 'border-detergent bg-detergent/10 text-detergent'
+          : 'border-gray-200 bg-white text-gray-700 hover:border-detergent/40'
         }`}
     >
       {Icon && <Icon size={30} strokeWidth={1.5} />}

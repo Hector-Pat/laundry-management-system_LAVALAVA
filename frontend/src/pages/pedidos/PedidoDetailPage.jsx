@@ -235,7 +235,7 @@ function PedidoDetailPage() {
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Folio</p>
-                <h1 className="text-3xl font-extrabold text-gray-800">{pedido.folio}</h1>
+                <h1 className="text-3xl font-extrabold text-ink">{pedido.folio}</h1>
                 <p className="text-sm text-gray-400 mt-1">Creado el {formatDateTime(pedido.createdAt)}</p>
               </div>
 
@@ -256,7 +256,7 @@ function PedidoDetailPage() {
                   <button
                     onClick={handleAdvance}
                     disabled={isUpdating}
-                    className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
+                    className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
                   >
                     {isUpdating && <Loader2 size={14} className="animate-spin" />}
                     {transition.next === 'ENTREGADO'
@@ -290,10 +290,10 @@ function PedidoDetailPage() {
                   <tbody className="divide-y divide-gray-100">
                     {pedido.items.map((item) => (
                       <tr key={item.id}>
-                        <td className="px-6 py-3 font-medium text-gray-800">{item.servicioName}</td>
+                        <td className="px-6 py-3 font-medium text-ink">{item.servicioName}</td>
                         <td className="px-6 py-3 text-gray-500">{item.quantity}</td>
                         <td className="px-6 py-3 text-gray-500">{formatCurrency(item.unitPrice)}</td>
-                        <td className="px-6 py-3 text-right font-semibold text-gray-800">
+                        <td className="px-6 py-3 text-right font-semibold text-ink">
                           {formatCurrency(item.subtotal)}
                         </td>
                       </tr>
@@ -304,7 +304,7 @@ function PedidoDetailPage() {
                       <td colSpan={3} className="px-6 py-3 font-semibold text-gray-600 text-right">
                         Total
                       </td>
-                      <td className="px-6 py-3 text-right font-extrabold text-gray-800 text-lg">
+                      <td className="px-6 py-3 text-right font-extrabold text-ink text-lg">
                         {formatCurrency(pedido.total)}
                       </td>
                     </tr>
@@ -315,7 +315,7 @@ function PedidoDetailPage() {
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
                 <div>
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Cliente</p>
-                  <p className="font-semibold text-gray-800">{pedido.cliente.fullName}</p>
+                  <p className="font-semibold text-ink">{pedido.cliente.fullName}</p>
                   <p className="text-sm text-gray-500">{pedido.cliente.phoneNumber}</p>
                   {pedido.cliente.email && <p className="text-sm text-gray-500">{pedido.cliente.email}</p>}
                 </div>
@@ -330,11 +330,11 @@ function PedidoDetailPage() {
             {canManagePagos && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <h2 className="font-semibold text-gray-800">Pagos</h2>
+                  <h2 className="font-semibold text-ink">Pagos</h2>
                   {paymentSummary && paymentSummary.saldoPendiente > 0 && !pedido.cancelledAt && (
                     <button
                       onClick={() => setShowPaymentModal(true)}
-                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
+                      className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover text-white font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
                     >
                       <Plus size={16} />
                       Registrar pago
@@ -351,15 +351,15 @@ function PedidoDetailPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="bg-gray-50 rounded-xl px-4 py-3">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total</p>
-                        <p className="text-lg font-bold text-gray-800">{formatCurrency(paymentSummary.total)}</p>
+                        <p className="text-lg font-bold text-ink">{formatCurrency(paymentSummary.total)}</p>
                       </div>
                       <div className="bg-gray-50 rounded-xl px-4 py-3">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Pagado</p>
-                        <p className="text-lg font-bold text-green-600">{formatCurrency(paymentSummary.totalPagado)}</p>
+                        <p className="text-lg font-bold text-sage">{formatCurrency(paymentSummary.totalPagado)}</p>
                       </div>
                       <div className="bg-gray-50 rounded-xl px-4 py-3">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Saldo pendiente</p>
-                        <p className={`text-lg font-bold ${paymentSummary.saldoPendiente > 0 ? 'text-amber-600' : 'text-gray-800'}`}>
+                        <p className={`text-lg font-bold ${paymentSummary.saldoPendiente > 0 ? 'text-amber-600' : 'text-ink'}`}>
                           {formatCurrency(paymentSummary.saldoPendiente)}
                         </p>
                       </div>
@@ -376,7 +376,7 @@ function PedidoDetailPage() {
                           >
                             <div>
                               <span
-                                className={`font-semibold ${pago.isVoided ? 'text-gray-500 line-through' : 'text-gray-800'}`}
+                                className={`font-semibold ${pago.isVoided ? 'text-gray-500 line-through' : 'text-ink'}`}
                               >
                                 {formatCurrency(pago.amount)}
                               </span>
@@ -412,7 +412,7 @@ function PedidoDetailPage() {
             {canManageReclamaciones && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <h2 className="font-semibold text-gray-800">Daños y reclamaciones</h2>
+                  <h2 className="font-semibold text-ink">Daños y reclamaciones</h2>
                   <button
                     onClick={() => setShowReclamacionModal(true)}
                     className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
@@ -437,7 +437,7 @@ function PedidoDetailPage() {
                             <span
                               className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
                                 reclamacion.status === 'RESUELTA'
-                                  ? 'bg-green-50 text-green-600'
+                                  ? 'bg-green-50 text-sage'
                                   : 'bg-amber-50 text-amber-600'
                               }`}
                             >
@@ -445,9 +445,9 @@ function PedidoDetailPage() {
                             </span>
                             <p className="text-xs text-gray-400">{formatDateTime(reclamacion.createdAt)}</p>
                           </div>
-                          <p className="text-sm text-gray-800 mt-1">{reclamacion.description}</p>
+                          <p className="text-sm text-ink mt-1">{reclamacion.description}</p>
                           {reclamacion.status === 'RESUELTA' && (
-                            <p className="text-xs text-green-600 mt-1">
+                            <p className="text-xs text-sage mt-1">
                               Resuelto: {reclamacion.resolutionNotes}
                             </p>
                           )}
@@ -455,7 +455,7 @@ function PedidoDetailPage() {
                         {canResolveReclamaciones && reclamacion.status !== 'RESUELTA' && (
                           <button
                             onClick={() => setResolvingReclamacion(reclamacion)}
-                            className="shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                            className="shrink-0 text-xs font-medium text-detergent hover:text-detergent-hover"
                           >
                             Resolver
                           </button>
@@ -640,14 +640,14 @@ function PaymentModal({ saldoPendiente, onClose, onSubmit }) {
     <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">Registrar pago</h2>
+          <h2 className="font-semibold text-ink text-lg">Registrar pago</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
         </div>
 
         <p className="text-sm text-gray-500">
-          Saldo pendiente: <span className="font-semibold text-gray-800">{formatCurrency(saldoPendiente)}</span>
+          Saldo pendiente: <span className="font-semibold text-ink">{formatCurrency(saldoPendiente)}</span>
         </p>
 
         {error && (
@@ -668,7 +668,7 @@ function PaymentModal({ saldoPendiente, onClose, onSubmit }) {
               autoFocus
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
             />
             {!isValidAmount && amount !== '' && (
               <p className="text-xs text-red-500 mt-1">
@@ -682,7 +682,7 @@ function PaymentModal({ saldoPendiente, onClose, onSubmit }) {
             <select
               value={method}
               onChange={(e) => setMethod(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
             >
               {PAYMENT_METHOD_VALUES.map((value) => (
                 <option key={value} value={value}>
@@ -696,14 +696,14 @@ function PaymentModal({ saldoPendiente, onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+              className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={!isValidAmount || isSubmitting}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Registrar
@@ -740,7 +740,7 @@ function ReclamacionModal({ onClose, onSubmit }) {
     <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">Reportar daño o reclamación</h2>
+          <h2 className="font-semibold text-ink text-lg">Reportar daño o reclamación</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
@@ -762,7 +762,7 @@ function ReclamacionModal({ onClose, onSubmit }) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ej. Mancha en camisa blanca detectada al planchar"
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent resize-none"
             />
           </div>
 
@@ -770,7 +770,7 @@ function ReclamacionModal({ onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+              className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
             >
               Cancelar
             </button>
@@ -814,7 +814,7 @@ function ResolveReclamacionModal({ onClose, onSubmit }) {
     <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">Resolver reclamación</h2>
+          <h2 className="font-semibold text-ink text-lg">Resolver reclamación</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
@@ -836,7 +836,7 @@ function ResolveReclamacionModal({ onClose, onSubmit }) {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ej. Se aplicó un descuento del 20% al pedido"
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent resize-none"
             />
           </div>
 
@@ -844,14 +844,14 @@ function ResolveReclamacionModal({ onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+              className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Marcar como resuelta
@@ -888,14 +888,14 @@ function VoidPagoModal({ pago, onClose, onSubmit }) {
     <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">Anular pago</h2>
+          <h2 className="font-semibold text-ink text-lg">Anular pago</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
         </div>
 
         <p className="text-sm text-gray-500">
-          Monto: <span className="font-semibold text-gray-800">{formatCurrency(pago.amount)}</span> del{' '}
+          Monto: <span className="font-semibold text-ink">{formatCurrency(pago.amount)}</span> del{' '}
           {formatDateTime(pago.createdAt)}
         </p>
 
@@ -915,7 +915,7 @@ function VoidPagoModal({ pago, onClose, onSubmit }) {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Ej. Monto capturado por error"
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent resize-none"
             />
           </div>
 
@@ -923,7 +923,7 @@ function VoidPagoModal({ pago, onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+              className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
             >
               Volver
             </button>
@@ -967,7 +967,7 @@ function CancelModal({ onClose, onSubmit }) {
     <div className="print:hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">Cancelar pedido</h2>
+          <h2 className="font-semibold text-ink text-lg">Cancelar pedido</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
@@ -994,7 +994,7 @@ function CancelModal({ onClose, onSubmit }) {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Ej. El cliente ya no requiere el servicio"
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent resize-none"
             />
           </div>
 
@@ -1002,7 +1002,7 @@ function CancelModal({ onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+              className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
             >
               Volver
             </button>

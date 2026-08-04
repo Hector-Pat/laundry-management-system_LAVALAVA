@@ -40,7 +40,7 @@ function ServicioModal({ servicio, onClose, onSaved }) {
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800 text-lg">{isEdit ? 'Editar servicio' : 'Nuevo servicio'}</h2>
+          <h2 className="font-semibold text-ink text-lg">{isEdit ? 'Editar servicio' : 'Nuevo servicio'}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
@@ -61,7 +61,7 @@ function ServicioModal({ servicio, onClose, onSaved }) {
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -73,7 +73,7 @@ function ServicioModal({ servicio, onClose, onSaved }) {
               min="0.01"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-detergent"
             />
           </div>
 
@@ -81,14 +81,14 @@ function ServicioModal({ servicio, onClose, onSaved }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+              className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Guardar
@@ -166,12 +166,12 @@ function ServiciosPage() {
       <div className="flex flex-col h-full gap-5">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Catálogo de servicios</h1>
+            <h1 className="text-2xl font-bold text-ink">Catálogo de servicios</h1>
             <p className="text-sm text-gray-400 mt-0.5">Administra los servicios y precios disponibles</p>
           </div>
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
+            className="inline-flex items-center gap-2 bg-detergent hover:bg-detergent-hover text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
           >
             <Plus size={16} />
             Nuevo servicio
@@ -212,12 +212,12 @@ function ServiciosPage() {
 
                     return (
                       <tr key={servicio.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 font-medium text-gray-800">{servicio.name}</td>
+                        <td className="px-6 py-4 font-medium text-ink">{servicio.name}</td>
                         <td className="px-6 py-4 text-gray-500">{formatCurrency(servicio.price)}</td>
                         <td className="px-6 py-4">
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                              servicio.isActive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'
+                              servicio.isActive ? 'bg-green-50 text-sage' : 'bg-red-50 text-red-500'
                             }`}
                           >
                             {servicio.isActive ? 'Activo' : 'Inactivo'}
@@ -239,7 +239,7 @@ function ServiciosPage() {
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                                 servicio.isActive
                                   ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                  : 'bg-green-50 text-green-600 hover:bg-green-100'
+                                  : 'bg-green-50 text-sage hover:bg-green-100'
                               }`}
                             >
                               {isRowUpdating ? (

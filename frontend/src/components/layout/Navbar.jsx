@@ -98,7 +98,7 @@ function ChangePasswordModal({ onClose }) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2"
+                  className="inline-flex items-center text-sm font-medium text-ink/70 hover:text-ink border border-ink/20 hover:bg-ink/5 rounded-xl px-4 py-2 transition-colors"
                 >
                   Cancelar
                 </button>
